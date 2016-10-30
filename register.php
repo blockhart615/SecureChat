@@ -1,6 +1,6 @@
 <?php
- 
-require_once 'include/DB_Functions.php';
+
+require_once 'Database/DB_Functions.php';
 $db = new DB_Functions();
 
 // json response array
@@ -14,7 +14,7 @@ if (isset($_POST['name']) && isset($_POST['email']) && isset($_POST['password'])
     $password = $_POST['password'];
 
     // check if user is already existed with the same email
-    if ($db->isUserExisted($email)) {
+    if ($db->userExists($email)) {
         // user already existed
         $response["error"] = TRUE;
         $response["error_msg"] = "User already existed with " . $email;
