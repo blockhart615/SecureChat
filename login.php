@@ -19,8 +19,8 @@ if ($username && $password && $action == 'login' ) {
     	$tokenId    = base64_encode(mcrypt_create_iv(32));
       $issuedAt   = time();
       $notBefore  = $issuedAt + 10;  //Adding 10 seconds
-      $expire     = $notBefore + 7200*6; // Adding 60 seconds
-      $serverName = 'https://www.toastabout.com/'; /// set your domain name
+      $expire     = $notBefore + 60; //Token expires in 60 seconds
+      $serverName = 'https://www.toastabout.com/'; //domain name
 
       /*
       * Create the token as an array
