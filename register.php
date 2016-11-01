@@ -14,33 +14,35 @@ if (isset($_POST['username']) && isset($_POST['email']) && isset($_POST['passwor
     $password = $_POST['password'];
 
     // check if user is already existed with the same email
-    if ($db->userExists($email)) {
+    if ($db->userExists($username)) {
         // user already existed
-        $response["error"] = TRUE;
-        $response["error_msg"] = "User already existed with " . $email;
-        echo json_encode($response);
+      //   $response["error"] = TRUE;
+      //   $response["error_msg"] = "Username " . $username . " already exists. Please pick another username.";
+      //   echo json_encode($response);
+		echo "Username " . $username . " already exists. Please pick another username.";
     } else {
         // create a new user
         $user = $db->storeUser($username, $email, $password);
         if ($user) {
             // user stored successfully
-            $response["error"] = FALSE;
-            // $response["uid"] = $user["unique_id"];
-            $response["user"]["username"] = $user["username"];
-            $response["user"]["email"] = $user["email"];
-            $response["user"]["created_at"] = $user["created_at"];
-            $response["user"]["updated_at"] = $user["updated_at"];
-            echo json_encode($response);
+            // $response["error"] = FALSE;
+				echo "User Account Creation Successful! <br/>";
+				echo $user["username"] . "<br/>";
+            echo $user["email"] . "<br/>";
+            echo $user["created_at"] . "<br/>";
+            // echo json_encode($response);
         } else {
             // user failed to store
-            $response["error"] = TRUE;
-            $response["error_msg"] = "Unknown error occurred in registration!";
-            echo json_encode($response);
+            // $response["error"] = TRUE;
+            // $response["error_msg"] = "Unknown error occurred in registration!";
+            // echo json_encode($response);
+				echo "Unknown error occurred during registration.";
         }
     }
 } else {
-    $response["error"] = TRUE;
-    $response["error_msg"] = "Required parameters (username, email or password) is missing!";
-    echo json_encode($response);
+   //  $response["error"] = TRUE;
+   //  $response["error_msg"] = "Required parameters (username, email or password) missing.";
+   //  echo json_encode($response);
+	echo "Required parameters (username, email or password) missing.";
 }
 ?>

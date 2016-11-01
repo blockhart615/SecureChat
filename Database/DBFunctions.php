@@ -79,9 +79,9 @@
 	    /**
 	     * Checks whether or not the user exists
 	     */
-	    public function userExists($email) {
-	        $stmt = $this->conn->prepare("SELECT email from users WHERE email = ?");
-	        $stmt->bind_param("s", $email);
+	    public function userExists($username) {
+	        $stmt = $this->conn->prepare("SELECT username from users WHERE username = ?");
+	        $stmt->bind_param("s", $username);
 	        $stmt->execute();
 	        $stmt->store_result();
 
