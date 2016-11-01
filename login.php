@@ -1,4 +1,5 @@
 <?php
+require_once('vendor/autoload.php');
 require_once 'Database/DBFunctions.php';
 use \Firebase\JWT\JWT;
 define('ALGORITHM', 'HS256');
@@ -26,7 +27,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
         $tokenID = base64_encode(mcrypt_create_iv(32));
         $issuedAt = time();
         $notBefore = $issuedAt + 10; //add 10 seconds
-        $expireTime = $notBefore + 60; //60 seconds after not before
+        $expireTime = $notBefore + 180; //3 minutes after not before
         $serverName = 'https://www.toastabout.com';
 
         //create token as an array
@@ -46,8 +47,8 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
 
         //encode into a JWT
         $jwt = JWT::encode(
-            $data,
-            $secretKey,
+            $data, //data being encoded into the token
+            $secretKey, //key to sign the token
             ALGORITHM
         );
 
