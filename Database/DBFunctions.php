@@ -31,7 +31,7 @@
 	        $encrypted_password = $hash["encrypted"]; // encrypted password
 	        $salt = $hash["salt"]; // salt
 
-	        $stmt = $this->conn->prepare("INSERT INTO users(unique_id, username, email, encrypted_password, salt, created_at) VALUES(?, ?, ?, ?, ?, NOW())");
+	        $stmt = $this->conn->prepare("INSERT INTO users(username, email, encrypted_password, salt, created_at) VALUES(?, ?, ?, ?, NOW())");
 	        $stmt->bind_param("sssss", $uuid, $username, $email, $encrypted_password, $salt);
 	        $result = $stmt->execute();
 	        $stmt->close();
