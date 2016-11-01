@@ -12,7 +12,7 @@
 	    function __construct() {
 	        require_once 'DBConnect.php';
 	        // connecting to database
-	        $db = new Db_Connect();
+	        $db = new DBConnect();
 	        $this->conn = $db->connect();
 	    }
 
