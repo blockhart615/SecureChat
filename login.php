@@ -14,7 +14,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
     // get the user by username and password
     $user = $db->getUserByUsernameAndPassword($username, $password);
 
-    if ($user != false) {
+    if ($user != NULL) {
         // use is found
         $response["error"] = FALSE;
         $response["user"]["name"] = $user["name"];
