@@ -1,6 +1,6 @@
 <?php
 
-require_once 'Database/DB_Functions.php';
+require_once 'Database/DBFunctions.php';
 $db = new DB_Functions();
 
 // json response array
