@@ -126,20 +126,25 @@
 	 	 */
 	 	public function sendMessage($message, $receiver, $sender) {
 	 		//prepare statements to protect against SQL injections.
-	 		$stmt = $this->conn->prepare("INSERT INTO messages(sender, receiver, message, timeSent) VALUES(?, ?, ?, NOW())");
+	 		$stmt = $this->conn->prepare("INSERT INTO messages(sender, receiver, message, time_sent) VALUES(?, ?, ?, NOW())");
 	 		$stmt->bind_param("sss", $sender, $receiver, $message);
 	 		$result = $stmt->execute();
 	 		$stmt->close();
 
-			return $result;
+			if ($result) {
+				return true;
+			}
+			else {
+				return false;
+			}
 	 	}
 
 	 	/*
 	 	 * Receives messages from the database
 	 	 */
-	 	public function receiveMessages($user) {
-
-			return NULL;
-	 	}
+		// 	public function receiveMessages($user) {
+		//
+		// 	return NULL;
+		// 	}
 	}
 ?>
