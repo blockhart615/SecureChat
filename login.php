@@ -43,12 +43,12 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
             ]
         ];
 
-        // $secretKey = base64_decode(SECRET_KEY);
+        $secretKey = base64_encode(SECRET_KEY);
 
         //encode into a JWT
         $jwt = JWT::encode(
             $data, //data being encoded into the token
-            SECRET_KEY, //key to sign the token
+            $secretKey, //key to sign the token
             ALGORITHM
         );
 
