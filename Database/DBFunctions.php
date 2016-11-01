@@ -102,10 +102,10 @@
 	     * returns salt and encrypted password
 	     */
 	    public function hashSSHA($password) {
-	        $salt = sha1(mt_rand());
-	        $salt = substr($salt, 0, 128);
-	        $encryptedPW = base64_encode(sha1($password . $salt, true) . $salt);
-	        $hash = array("salt" => $salt, "encrypted" => $encryptedPW);
+			 $salt = hash("sha256", mt_rand());
+			 $salt = substr($salt, 0, 256);
+			 $encryptedPW = base64_encode(hash("sha256", $password . $salt) . $salt);
+			 $hash = array("salt" => $salt, "encrypted" => $encryptedPW);
 	        return $hash;
 	    }
 
@@ -115,7 +115,7 @@
 	     * returns hash string
 	     */
 	    public function checkhashSSHA($salt, $password) {
-	        $hash = base64_encode(sha1($password . $salt, true) . $salt);
+			 $hash = base64_encode(hash("sha256", $password . $salt) . $salt);
 	        return $hash;
 	    }
 	}
