@@ -1,5 +1,5 @@
 <?php
-require_once 'include/DBFunctions.php';
+require_once 'Database/DBFunctions.php';
 $db = new DBFunctions();
 
 // json response array
