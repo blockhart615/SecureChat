@@ -11,17 +11,15 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    // get the user by email and password
+    // get the user by username and password
     $user = $db->getUserByUsernameAndPassword($username, $password);
 
     if ($user != false) {
         // use is found
         $response["error"] = FALSE;
-        $response["uid"] = $user["unique_id"];
         $response["user"]["name"] = $user["name"];
-        $response["user"]["email"] = $user["email"];
+        $response["user"]["username"] = $user["username"];
         $response["user"]["created_at"] = $user["created_at"];
-        $response["user"]["updated_at"] = $user["updated_at"];
         echo json_encode($response);
     } else {
         // user is not found with the credentials
