@@ -124,12 +124,14 @@
 		 /*
 	 	 * Sends a message to the database
 	 	 */
-	 	public function sendMessage($message, $recipient, $sender) {
+	 	public function sendMessage($message, $receiver, $sender) {
 	 		//prepare statements to protect against SQL injections.
 	 		$stmt = $this->conn->prepare("INSERT INTO messages(sender, receiver, message, timeSent) VALUES(?, ?, ?, NOW())");
-	 		$stmt->bind_param("sss", $sender, $recipient, $message);
+	 		$stmt->bind_param("sss", $sender, $receiver, $message);
 	 		$result = $stmt->execute();
 	 		$stmt->close();
+
+			return $result;
 	 	}
 
 	 	/*
@@ -137,6 +139,7 @@
 	 	 */
 	 	public function receiveMessages($user) {
 
-	 	}		 
+			return NULL;
+	 	}
 	}
 ?>
