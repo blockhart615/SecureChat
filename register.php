@@ -1,7 +1,7 @@
 <?php
 
 require_once 'Database/DBFunctions.php';
-$db = new DB_Functions();
+$db = new DBFunctions();
 
 // json response array
 $response = array("error" => FALSE);
