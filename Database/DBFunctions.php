@@ -26,7 +26,7 @@
 	     * returns user details
 	     */
 	    public function storeUser($username, $email, $password) {
-	        $uuid = uniqid('', true);
+	      //$uuid = uniqid('', true);
 	        $hash = $this->hashSSHA($password);
 	        $encrypted_password = $hash["encrypted"]; // encrypted password
 	        $salt = $hash["salt"]; // salt
@@ -53,10 +53,10 @@
 	    /**
 	     * Get user by email and password
 	     */
-	    public function getUserByEmailAndPassword($email, $password) {
+	    public function getUserByUsernameAndPassword($username, $password) {
 
-	        $stmt = $this->conn->prepare("SELECT * FROM users WHERE email = ?");
-	        $stmt->bind_param("s", $email);
+	        $stmt = $this->conn->prepare("SELECT * FROM users WHERE username = ?");
+	        $stmt->bind_param("s", $username);
 
 	        if ($stmt->execute()) {
 	            $user = $stmt->get_result()->fetch_assoc();

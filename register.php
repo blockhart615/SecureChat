@@ -25,7 +25,7 @@ if (isset($_POST['username']) && isset($_POST['email']) && isset($_POST['passwor
         if ($user) {
             // user stored successfully
             $response["error"] = FALSE;
-            $response["uid"] = $user["unique_id"];
+            // $response["uid"] = $user["unique_id"];
             $response["user"]["username"] = $user["username"];
             $response["user"]["email"] = $user["email"];
             $response["user"]["created_at"] = $user["created_at"];
