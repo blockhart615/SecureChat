@@ -120,5 +120,23 @@
 			 $hash = base64_encode(hash("sha256", $password . $salt) . $salt);
 	        return $hash;
 	    }
+
+		 /*
+	 	 * Sends a message to the database
+	 	 */
+	 	public function sendMessage($message, $recipient, $sender) {
+	 		//prepare statements to protect against SQL injections.
+	 		$stmt = $this->conn->prepare("INSERT INTO messages(sender, receiver, message, timeSent) VALUES(?, ?, ?, NOW())");
+	 		$stmt->bind_param("sss", $sender, $recipient, $message);
+	 		$result = $stmt->execute();
+	 		$stmt->close();
+	 	}
+
+	 	/*
+	 	 * Receives messages from the database
+	 	 */
+	 	public function receiveMessages($user) {
+
+	 	}		 
 	}
 ?>
