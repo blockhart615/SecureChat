@@ -9,7 +9,7 @@ define('SECRET_KEY','Your-Secret-Key');
 $db = new DBFunctions();
 
 // json response array
-$response = array("error" => FALSE);
+// $response = array("error" => FALSE);
 
 if (isset($_POST['username']) && isset($_POST['password'])) {
 
@@ -61,14 +61,16 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
         // echo json_encode($response);
     } else {
         // user is not found with the credentials
-        $response["error"] = TRUE;
-        $response["error_msg"] = "Username or password are incorrect. Please try again!";
-        echo json_encode($response);
+      //   $response["error"] = TRUE;
+      //   $response["error_msg"] = "Username or password are incorrect. Please try again!";
+		  echo "Username or password are incorrect. Please try again!";
+      //   echo json_encode($response);
     }
 } else {
     // required post params is missing
-    $response["error"] = TRUE;
-    $response["error_msg"] = "Required parameters username or password is missing!";
-    echo json_encode($response);
+   //  $response["error"] = TRUE;
+   //  $response["error_msg"] = "Required parameters username or password is missing!";
+   //  echo json_encode($response);
+	echo "Required parameters username or password is missing!";
 }
 ?>

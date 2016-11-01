@@ -4,7 +4,7 @@ require_once 'Database/DBFunctions.php';
 $db = new DBFunctions();
 
 // json response array
-$response = array("error" => FALSE);
+// $response = array("error" => FALSE);
 
 if (isset($_POST['username']) && isset($_POST['email']) && isset($_POST['password'])) {
 
@@ -27,9 +27,9 @@ if (isset($_POST['username']) && isset($_POST['email']) && isset($_POST['passwor
             // user stored successfully
             // $response["error"] = FALSE;
 				echo "User Account Creation Successful! <br/>";
-				echo $user["username"] . "<br/>";
-            echo $user["email"] . "<br/>";
-            echo $user["created_at"] . "<br/>";
+				echo "Username: " . $user["username"] . "<br/>";
+            echo "Email: " . $user["email"] . "<br/>";
+            echo "Date Created: " . $user["created_at"] . "<br/>";
             // echo json_encode($response);
         } else {
             // user failed to store
