@@ -1,9 +1,4 @@
 <?php
-/**
- * @author Ravi Tamada
- * @link http://www.androidhive.info/2012/01/android-login-and-registration-with-php-mysql-and-sqlite/ Complete tutorial
- */
-
 	class DBFunctions {
 
 	    private $conn;
@@ -11,7 +6,7 @@
 	    // constructor
 	    function __construct() {
 	        require_once 'DBConnect.php';
-	        // connecting to database
+	        // connect to database
 	        $db = new DBConnect();
 	        $this->conn = $db->connect();
 	    }
@@ -22,30 +17,33 @@
 	    }
 
 	    /**
-	     * Storing new user
-	     * returns user details
+	     * Stores user info into the database
+	     * returns user details upon successful store
 	     */
 	    public function storeUser($username, $email, $password) {
-	      //$uuid = uniqid('', true);
+			 //hash the password before storing
 	        $hash = $this->hashSSHA($password);
 	        $encrypted_password = $hash["encrypted"]; // encrypted password
 	        $salt = $hash["salt"]; // salt
 
+			  //prepare statements to protect against SQL injections.
 	        $stmt = $this->conn->prepare("INSERT INTO users(username, email, encrypted_password, salt, created_at) VALUES(?, ?, ?, ?, NOW())");
 	        $stmt->bind_param("ssss", $username, $email, $encrypted_password, $salt);
 	        $result = $stmt->execute();
 	        $stmt->close();
 
-	        // check for successful store
+	        //if storage was successful, get user credentials to return.
 	        if ($result) {
 	            $stmt = $this->conn->prepare("SELECT * FROM users WHERE email = ?");
 	            $stmt->bind_param("s", $email);
 	            $stmt->execute();
+					//get user credentials
 	            $user = $stmt->get_result()->fetch_assoc();
 	            $stmt->close();
 
 	            return $user;
-	        } else {
+	        }
+			  else { //user storage failed.
 	            return false;
 	        }
 	    }
@@ -54,10 +52,11 @@
 	     * Get user by email and password
 	     */
 	    public function getUserByUsernameAndPassword($username, $password) {
-
+			 //prepare statements to protect against SQL injections
 	        $stmt = $this->conn->prepare("SELECT * FROM users WHERE username = ?");
 	        $stmt->bind_param("s", $username);
 
+			  //if statement executes successfully, assign data to user array.
 	        if ($stmt->execute()) {
 	            $user = $stmt->get_result()->fetch_assoc();
 	            $stmt->close();
@@ -66,12 +65,14 @@
 	            $salt = $user['salt'];
 	            $encrypted_password = $user['encrypted_password'];
 	            $hash = $this->checkhashSSHA($salt, $password);
-	            // check for password equality
+	            // checks if the pw in the DB matches the hash performed
 	            if ($encrypted_password == $hash) {
-	                // user authentication details are correct
+	                // user authentication details are correct, returns user data
 	                return $user;
 	            }
-	        } else {
+	        }
+			  else {
+				  //return NULL if the user wasn't found
 	            return NULL;
 	        }
 	    }
@@ -80,7 +81,8 @@
 	     * Checks whether or not the user exists
 	     */
 	    public function userExists($username) {
-	        $stmt = $this->conn->prepare("SELECT username from users WHERE username = ?");
+			 //prepare statements to protect against SQL injections
+			  $stmt = $this->conn->prepare("SELECT username from users WHERE username = ?");
 	        $stmt->bind_param("s", $username);
 	        $stmt->execute();
 	        $stmt->store_result();
