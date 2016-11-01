@@ -17,8 +17,8 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
     if ($user != NULL) {
         // use is found
         $response["error"] = FALSE;
-        $response["user"]["name"] = $user["name"];
         $response["user"]["username"] = $user["username"];
+        $response["user"]["email"] = $user["email"];
         $response["user"]["created_at"] = $user["created_at"];
         echo json_encode($response);
     } else {
