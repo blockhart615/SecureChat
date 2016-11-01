@@ -8,15 +8,15 @@ if (isset($_POST['message-to-send']) && isset($_POST['recipient']) && isset($_PO
 
 	//get POST parameters and assign to variables
 	$message = $_POST['message-to-send'];
-	$recipient = $_POST['recipient'];
+	$receiver = $_POST['recipient'];
 	$sender = $_POST['sender'];
 
 	//if the user exists, and the message isn't null, then send a message
-	if (db->userExists($recipient) && $message != NULL) {
-		db->sendMessage($message, $recipient, $sender);
+	if ($db->userExists($recipient) && $message != NULL) {
+		$db->sendMessage($sender, $receiver, $message);
 	}
 	//if user is not found in database, output error message
-	if (!db->userExists($recipient)) {
+	if (!($db->userExists($recipient))){
 		echo "That user does not exist in our database. Check the recpient's username.";
 	}
 	//if sender tries to send a blank message

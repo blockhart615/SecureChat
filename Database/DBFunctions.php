@@ -124,7 +124,7 @@
 		 /*
 	 	 * Sends a message to the database
 	 	 */
-	 	public function sendMessage($message, $receiver, $sender) {
+	 	public function sendMessage($sender, $receiver, $message) {
 	 		//prepare statements to protect against SQL injections.
 	 		$stmt = $this->conn->prepare("INSERT INTO messages(sender, receiver, message, time_sent) VALUES(?, ?, ?, NOW())");
 	 		$stmt->bind_param("sss", $sender, $receiver, $message);
