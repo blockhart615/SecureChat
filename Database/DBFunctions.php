@@ -4,7 +4,7 @@
  * @link http://www.androidhive.info/2012/01/android-login-and-registration-with-php-mysql-and-sqlite/ Complete tutorial
  */
 
-	class DB_Functions {
+	class DBFunctions {
 
 	    private $conn;
 
