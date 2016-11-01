@@ -1,5 +1,10 @@
 <?php
 require_once 'Database/DBFunctions.php';
+use \Firebase\JWT\JWT;
+define('ALGORITHM', 'HS256');
+define('SECRET_KEY','Your-Secret-Key');
+
+
 $db = new DBFunctions();
 
 // json response array
@@ -15,16 +20,48 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
     $user = $db->getUserByUsernameAndPassword($username, $password);
 
     if ($user != NULL) {
-        // use is found
-        $response["error"] = FALSE;
-        $response["user"]["username"] = $user["username"];
-        $response["user"]["email"] = $user["email"];
-        $response["user"]["created_at"] = $user["created_at"];
-        echo json_encode($response);
+        // user is found
+
+        //build JSON Web Token
+        $tokenID = base64_encode(mcrypt_create_iv(32));
+        $issuedAt = time();
+        $notBefore = $issuedAt + 10; //add 10 seconds
+        $expireTime = $notBefore + 60; //60 seconds after not before
+        $serverName = 'https://www.toastabout.com';
+
+        //create token as an array
+        $data = [
+            'iat' => $issuedAt,
+            'jti' => $tokenID,
+            'iss' => $serverName,
+            'nbf' => $notBefore,
+            'exp' => $expireTime,
+            'data' => [
+                'username' => $user['username'],
+                'email' => $user['email'],
+            ]
+        ];
+
+        $secretKey = base64_decode(SECRET_KEY);
+
+        //encode into a JWT
+        $jwt = JWT::encode(
+            $data,
+            $secretKey,
+            ALGORITHM
+        );
+
+        echo $jwt;
+
+        // $response["error"] = FALSE;
+        // $response["user"]["username"] = $user["username"];
+        // $response["user"]["email"] = $user["email"];
+        // $response["user"]["created_at"] = $user["created_at"];
+        // echo json_encode($response);
     } else {
         // user is not found with the credentials
         $response["error"] = TRUE;
-        $response["error_msg"] = "Login credentials are wrong. Please try again!";
+        $response["error_msg"] = "Username or password are incorrect. Please try again!";
         echo json_encode($response);
     }
 } else {
