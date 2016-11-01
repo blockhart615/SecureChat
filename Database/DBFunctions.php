@@ -32,7 +32,7 @@
 	        $salt = $hash["salt"]; // salt
 
 	        $stmt = $this->conn->prepare("INSERT INTO users(username, email, encrypted_password, salt, created_at) VALUES(?, ?, ?, ?, NOW())");
-	        $stmt->bind_param("sssss", $uuid, $username, $email, $encrypted_password, $salt);
+	        $stmt->bind_param("ssss", $username, $email, $encrypted_password, $salt);
 	        $result = $stmt->execute();
 	        $stmt->close();
 
