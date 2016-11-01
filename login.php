@@ -30,7 +30,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
 } else {
     // required post params is missing
     $response["error"] = TRUE;
-    $response["error_msg"] = "Required parameters email or password is missing!";
+    $response["error_msg"] = "Required parameters username or password is missing!";
     echo json_encode($response);
 }
 ?>
