@@ -10,7 +10,7 @@
 
 	    // constructor
 	    function __construct() {
-	        require_once 'DB_Connect.php';
+	        require_once 'DBConnect.php';
 	        // connecting to database
 	        $db = new Db_Connect();
 	        $this->conn = $db->connect();
