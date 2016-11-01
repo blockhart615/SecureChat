@@ -12,7 +12,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
     $password = $_POST['password'];
 
     // get the user by email and password
-    $user = $db->getUserByEmailAndPassword($username, $password);
+    $user = $db->getUserByUsernameAndPassword($username, $password);
 
     if ($user != false) {
         // use is found
