@@ -25,14 +25,14 @@
 	     * Storing new user
 	     * returns user details
 	     */
-	    public function storeUser($name, $email, $password) {
+	    public function storeUser($username, $email, $password) {
 	        $uuid = uniqid('', true);
 	        $hash = $this->hashSSHA($password);
 	        $encrypted_password = $hash["encrypted"]; // encrypted password
 	        $salt = $hash["salt"]; // salt
 
-	        $stmt = $this->conn->prepare("INSERT INTO users(unique_id, name, email, encrypted_password, salt, created_at) VALUES(?, ?, ?, ?, ?, NOW())");
-	        $stmt->bind_param("sssss", $uuid, $name, $email, $encrypted_password, $salt);
+	        $stmt = $this->conn->prepare("INSERT INTO users(unique_id, username, email, encrypted_password, salt, created_at) VALUES(?, ?, ?, ?, ?, NOW())");
+	        $stmt->bind_param("sssss", $uuid, $username, $email, $encrypted_password, $salt);
 	        $result = $stmt->execute();
 	        $stmt->close();
 

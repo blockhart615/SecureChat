@@ -10,7 +10,7 @@ class DBConnect {
 
       public function connect() {
             //make connection to database
-            $this->conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE);            
+            $this->conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE);
 
             return $this->conn;
       }
