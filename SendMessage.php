@@ -12,7 +12,7 @@ if (isset($_POST['message-to-send']) && isset($_POST['recipient']) && isset($_PO
 	$sender = $_POST['sender'];
 
 	//if the user exists, and the message isn't null, then send a message
-	if ($db->userExists($recipient) && $message != NULL) {
+	if ($db->userExists($receiver) && $message != NULL) {
 		$db->sendMessage($sender, $receiver, $message);
 	}
 	//if user is not found in database, output error message
