@@ -5,7 +5,11 @@ require_once 'Database/DBFunctions.php';
 $db = new DBFunctions();
 
 if (isset($_GET["receiver"])) {
-	$messages = $db->getMessages();
+
+	$user = $_GET["receiver"];
+
+
+	$messages = $db->getMessages($user);
 }
 
 echo $messages;
