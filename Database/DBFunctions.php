@@ -142,9 +142,21 @@
 	 	/*
 	 	 * Receives messages from the database
 	 	 */
-		// 	public function receiveMessages($user) {
-		//
-		// 	return NULL;
-		// 	}
+			public function getMessages($username) {
+				//prepare statements to protect against SQL injections
+  	        $stmt = $this->conn->prepare("SELECT * FROM messages WHERE username = ? ORDER BY sender");
+  	        $stmt->bind_param("s", $username);
+
+  			  //if statement executes successfully, assign data to user array.
+  	        if ($stmt->execute()) {
+  	            $messages = $stmt->get_result()->fetch_assoc();
+  	            $stmt->close();
+					return $messages;
+  	        }
+  			  else {
+  				  //return NULL if there are no messages
+  	         	return NULL;
+  	        }
+			}
 	}
 ?>
