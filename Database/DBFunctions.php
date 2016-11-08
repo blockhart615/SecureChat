@@ -16,6 +16,7 @@
 
 	    }
 
+
 	    /**
 	     * Stores user info into the database
 	     * returns user details upon successful store
@@ -48,6 +49,7 @@
 	        }
 	    }
 
+
 	    /**
 	     * Get user by email and password
 	     */
@@ -77,6 +79,7 @@
 	        }
 	    }
 
+
 	    /**
 	     * Checks whether or not the user exists
 	     */
@@ -98,6 +101,7 @@
 	        }
 	    }
 
+
 	    /**
 	     * Encrypting password
 	     * @param password
@@ -111,6 +115,7 @@
 	        return $hash;
 	    }
 
+
 	    /**
 	     * Decrypting password
 	     * @param salt, password
@@ -120,6 +125,7 @@
 			 $hash = base64_encode(hash("sha256", $password . $salt) . $salt);
 	        return $hash;
 	    }
+
 
 		 /*
 	 	 * Sends a message to the database
@@ -139,24 +145,35 @@
 			}
 	 	}
 
+
 	 	/*
 	 	 * Receives messages from the database
 	 	 */
 			public function getMessages($username) {
 				//prepare statements to protect against SQL injections
-  	        $stmt = $this->conn->prepare("SELECT * FROM messages WHERE username = ? ORDER BY sender");
-  	        $stmt->bind_param("s", $username);
+  	        $stmt = $this->conn->prepare("SELECT * FROM messages WHERE receiver = ? OR sender = ? ORDER BY sender");
+  	        $stmt->bind_param("ss", $username, $username);
 
-  			  //if statement executes successfully, assign data to user array.
-  	        if ($stmt->execute()) {
-  	            $messages = $stmt->get_result()->fetch_assoc();
+			  //if statement executes successfully, assign data to user array.
+			  if($stmt->execute()) {
+
+					$result = $stmt->get_result();
+					if ($result->num_rows > 0) {
+						while($row = $result->fetch_assoc()) {
+							echo $row['sender'] . ": \n";
+							echo $row['message'] . "\n";
+							echo $row['time_sent'] . "\n\n";
+						}
+					}
+					else {
+						echo "No messages to read.";
+					}
+			  }
+			  else {
+				  echo "Statement execution unsuccessful.\n";
+			  }
   	            $stmt->close();
-					return $messages;
-  	        }
-  			  else {
-  				  //return NULL if there are no messages
-  	         	return NULL;
-  	        }
+					return true;
 			}
 	}
 ?>
