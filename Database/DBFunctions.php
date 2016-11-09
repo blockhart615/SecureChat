@@ -157,23 +157,79 @@
 			  //if statement executes successfully, assign data to user array.
 			  if($stmt->execute()) {
 
-					$result = $stmt->get_result();
-					if ($result->num_rows > 0) {
-						while($row = $result->fetch_assoc()) {
-							echo $row['sender'] . ": \n";
-							echo $row['message'] . "\n";
-							echo $row['time_sent'] . "\n\n";
+			  	//ARRAY OF ASSOCIATIVE ARRAYS
+			  	$conversations[] = array();
+			  	$convo = "";
+
+				$result = $stmt->get_result();
+				if ($result->num_rows > 0) {
+					while($row = $result->fetch_assoc()) {
+						//get message contents into an associative array
+						$sender = $row['sender'];
+						$message = $row['message'];
+						$timeSent = $row['time_sent'];
+						$message = array(
+							"sender" => $sender,
+							'message' => $message,
+							'time_sent' => $timeSent
+							);
+						$jwtMessage = json_encode($message) . "\n\n";
+
+
+						//TO GET AN INDIVIDUAL CONVERSATION
+						if ($username != $sender) {
+							$convo = $sender;
 						}
+						else {
+							$convo = $username;
+						}
+
+						//if conversation already exists, add message to conversation
+						if (array_key_exists($convo, $conversations)) {
+							array_push($conversations->$convo, $jwtMessage);
+							echo "Conversation found: " . $conversations->$convo . "\n";
+						}
+						//if not, create new conversation.
+						else {
+							echo "Conversation not found, creating new conversation: ";
+							array_merge($conversations, array($convo => array($jwtMessage)));
+							echo "\t" . $convo . "\n";
+							// array_push($conversations, $convo => array($jwtMessage));
+						}
+						array_push($conversations, $jwtMessage);
+
+
+					} //END WHILE LOOP
+
+
+					//conversations = array of convo => arrays
+					//each $convo refers to an array of json objects
+
+
+
+					//output the conversations
+					foreach ($conversations as $convo => $messageArray) {
+						echo $convo . ":\n";
+						foreach ($convo as $jsonMessage) {
+							echo $jsonMessage . "\n";
+						}
+						echo "\n\n";
 					}
-					else {
-						echo "No messages to read.";
-					}
-			  }
-			  else {
-				  echo "Statement execution unsuccessful.\n";
-			  }
+				}
+				else {
+					echo "No messages to read.";
+				}
+			}
+			else {
+				echo "Statement execution unsuccessful.\n";
+			}
   	            $stmt->close();
 					return true;
-			}
+		}
+	
+
+
+
+
 	}
 ?>

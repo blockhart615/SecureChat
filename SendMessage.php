@@ -13,26 +13,24 @@ $db = new DBFunctions();
 
 if (isset($_POST['message-to-send']) && isset($_POST['recipient'])) {
 
-	echo "GETTING HEADERS\n";
+	//get HTTP headers and put them into an assoc array
 	$headers = apache_request_headers();
-	foreach ($headers as $key => $value) {
-		echo "$key : $value \n";
-	}
+
+
 	//get POST parameters and assign to variables
 	$message = $_POST['message-to-send'];
 	$receiver = $_POST['recipient'];
 	$token = $headers['Authorization'];
-	echo "TOKEN: " . $token . "\n";
 
-	echo "DECODE THE JWT\n";
+	//Decode token and put in assoc array
 	$decoded = JWT::decode($token, SECRET_KEY, array(ALGORITHM));
-	echo "CAST TOKEN TO ASSOC ARRAY\n";
 	$token_array = (array) $decoded;
-	echo "GET SENDER OUT OF TOKEN\n";
 	$sender = $token_array['data']->username;
 
+
 	//if the user exists, and the message isn't null, then send a message
-	if ($db->userExists($receiver) && $message != NULL) {
+	if ($db->userExists($receiver) && $db->userExists($sender) && $message != NULL) {
+		//sends the message to the database
 		$db->sendMessage($sender, $receiver, $message);
 		echo "Message sent successfully!\n";
 	}
