@@ -16,4 +16,6 @@
         completions."
     </string>
     <string name="title_activity_register">Register</string>
+    <string name="title_activity_inbox">InboxActivity</string>
+    <string name="title_activity_send_message">SendMessageActivity</string>
 </resources>
