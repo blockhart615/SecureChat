@@ -23,4 +23,23 @@
         android:textSize="48sp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"/>
+
+    <TextView
+        android:text="Here is your token: "
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView3"
+        android:layout_marginTop="70dp"
+        android:layout_below="@+id/text"
+        android:layout_alignLeft="@+id/text"
+        android:layout_alignStart="@+id/text"/>
+
+    <TextView
+        android:text="token"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/token"
+        android:layout_below="@+id/textView3"
+        android:layout_alignLeft="@+id/textView3"
+        android:layout_alignStart="@+id/textView3"/>
 </RelativeLayout>

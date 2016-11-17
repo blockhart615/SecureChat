@@ -6,6 +6,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.TextView;
 
 public class InboxActivity extends AppCompatActivity {
 
@@ -24,6 +25,15 @@ public class InboxActivity extends AppCompatActivity {
 						.setAction("Action", null).show();
 			}
 		});
+
+		Bundle extras = getIntent().getExtras();
+		if (extras != null) {
+			String jwt = extras.getString("jwt");
+			TextView tokenText = (TextView) findViewById(R.id.token);
+			tokenText.setText(jwt);
+		}
+
+
 	}
 
 }
