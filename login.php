@@ -9,6 +9,7 @@ define('SECRET_KEY','Your-Secret-Key');
 
 //instantiate db to perform Database functions
 $db = new DBFunctions();
+$response = array("error" => false);
 
 //if username and password are provided
 if (isset($_POST['username']) && isset($_POST['password'])) {
@@ -42,21 +43,22 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
             ]
         ];
 
-        // $secretKey = base64_decode(SECRET_KEY);
-
         //encode into a JWT
         $jwt = JWT::encode(
             $data, //data being encoded into the token
             SECRET_KEY, //key to sign the token
             ALGORITHM
         );
-
         echo $jwt;
 
     } else { //Username or Password were incorrect
-		  echo "Username or password are incorrect. Please try again!";
+        $response["error"] = true;
+        $response["error_msg"] = "Username or password are incorrect. Please try again!";
+        echo json_encode($response);
     }
 } else { //A parameter is missing
-	echo "Required parameters username or password is missing!";
+    $response["error"] = true;
+    $response["error_msg"] = "Required parameters username or password is missing!";
+    echo json_encode($response);
 }
 ?>
