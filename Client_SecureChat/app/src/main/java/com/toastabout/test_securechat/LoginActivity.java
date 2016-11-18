@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 //import com.android.volley.Response;
 //import com.android.volley.VolleyError;
@@ -30,8 +31,6 @@ import java.net.URL;
 
 public class LoginActivity extends AppCompatActivity {
 
-	Routes URL = new Routes();
-
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -52,14 +51,37 @@ public class LoginActivity extends AppCompatActivity {
 				String username = username_field.getText().toString().trim();
 				String password = password_field.getText().toString().trim();
 
-				login(username, password);
+				//make sure fields aren't empty
+				if (username.isEmpty()) {
+					Toast.makeText(LoginActivity.this, "Username field is empty", Toast.LENGTH_SHORT).show();
+				}
+				else if (password.isEmpty()) {
+					Toast.makeText(LoginActivity.this, "Password is empty", Toast.LENGTH_SHORT).show();
+				}
+//				else if (){
+					login(username, password);
+//				}
 			}
 		});
+
+		//Add listener for register link
+		TextView registerTxt = (TextView) findViewById(R.id.register_link);
+		registerTxt.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick (View view) {
+				Intent intent = new Intent("com.toastabout.test_securechat.RegisterActivity");
+				startActivity(intent);
+			}
+
+		});
+
+
 	}
 
 
 	public void login(String username, String password) {
 
+		Routes URL = new Routes();
 		int tmp;
 		String jwt = "";
 
@@ -81,17 +103,14 @@ public class LoginActivity extends AppCompatActivity {
 			//get input from server and store into variable.
 			//if credentials are correct, will return a jwt
 			InputStream is = httpURLConnection.getInputStream();
-			while((tmp=is.read())!=-1){
-				jwt+= (char)tmp;
+			while((tmp = is.read()) != -1){
+				jwt += (char)tmp;
 			}
 
 			//close input stream and disconnect connection
 			is.close();
 			httpURLConnection.disconnect();
 
-			//output response for debugging purposes
-			TextView token = (TextView) findViewById(R.id.token);
-			token.setText(jwt);
 
 			//if login is successful, send user to Inbox
 			Intent intent = new Intent("com.toastabout.test_securechat.InboxActivity");

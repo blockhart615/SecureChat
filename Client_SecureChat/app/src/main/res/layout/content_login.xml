@@ -17,24 +17,29 @@
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inputType="textPassword"
-        android:ems="10"
-        android:id="@+id/password"
-        android:hint="password"
-        android:layout_below="@+id/username"
-        android:layout_centerHorizontal="true"/>
-
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:inputType="textPersonName"
         android:ems="10"
         android:id="@+id/username"
         android:hint="username"
         android:layout_marginTop="92dp"
         android:layout_alignParentTop="true"
-        android:layout_alignLeft="@+id/password"
-        android:layout_alignStart="@+id/password"/>
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"/>
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:ems="10"
+        android:id="@+id/password"
+        android:hint="password"
+        android:layout_below="@+id/username"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"/>
 
     <Button
         android:text="login"
@@ -50,11 +55,12 @@
         android:textColor="@android:color/background_light"/>
 
     <TextView
-        android:text="token goes here"
+        android:text="Register"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/token"
+        android:id="@+id/register_link"
         android:layout_below="@+id/login_btn"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="51dp"/>
+        android:layout_marginTop="51dp"
+        android:textSize="18sp"/>
 </RelativeLayout>
