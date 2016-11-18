@@ -24,6 +24,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -86,37 +87,39 @@ public class LoginActivity extends AppCompatActivity {
 	}
 
 
-	public void login(String username, String password) {
+	public void login(final String username, final String password) {
 
 		Routes URL = new Routes();
 
-		HashMap<String, String> POSTparams = new HashMap<>();
-		POSTparams.put("username", username);
-		POSTparams.put("password", password);
-		JSONObject requestObject = new JSONObject(POSTparams);
 
+        // Request a string response from the provided URL.
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, URL.getLoginURL(),
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // Display the first 500 characters of the response string.
+                        Toast.makeText(LoginActivity.this, "Response is: " + response, Toast.LENGTH_SHORT).show();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(LoginActivity.this, "That didn't work!", Toast.LENGTH_SHORT).show();
+                    }
+                }
+        )
+        {
+            @Override
+            protected HashMap<String, String> getParams()
+            {
+                HashMap<String, String> params = new HashMap<>();
+                params.put("username", username);
+                params.put("password", password);
+                return params;
+            }
+        };
 
-		JsonObjectRequest jsObjRequest = new JsonObjectRequest
-				(Request.Method.POST, URL.getLoginURL(), requestObject, new Response.Listener<JSONObject>() {
-					String jwt = "";
-
-					@Override
-					public void onResponse(JSONObject response) {
-						jwt = response.toString();
-						Toast.makeText(LoginActivity.this, jwt, Toast.LENGTH_SHORT).show();
-					}
-				}, new Response.ErrorListener() {
-
-					@Override
-					public void onErrorResponse(VolleyError error) {
-						// TODO Auto-generated method stub
-						Toast.makeText(LoginActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
-					}
-				});
-
-		MySingleton.getInstance(this).addToRequestQueue(jsObjRequest);
-
-
+		MySingleton.getInstance(this).addToRequestQueue(stringRequest);
 
 
 
