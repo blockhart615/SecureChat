@@ -49,7 +49,9 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
             SECRET_KEY, //key to sign the token
             ALGORITHM
         );
-        echo $jwt;
+        $response ["error"] = false;
+        $response ["jwt"] = $jwt;
+        echo json_encode($response);
 
     } else { //Username or Password were incorrect
         $response["error"] = true;

@@ -13,10 +13,19 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -55,7 +64,7 @@ public class RegisterActivity extends AppCompatActivity {
 				else if (email.getText().toString().isEmpty()) {
 					Toast.makeText(RegisterActivity.this, "Email field is empty", Toast.LENGTH_SHORT).show();
 				}
-				else if (password.getText() != confirmPassword.getText()) {
+				else if (password.getText().equals(confirmPassword.getText())) {
 					Toast.makeText(RegisterActivity.this, "Passwords did not match.", Toast.LENGTH_SHORT).show();
 				}
 				else {
@@ -74,51 +83,55 @@ public class RegisterActivity extends AppCompatActivity {
 	 * @param password desire password of the user
 	 * @param email User's email address
 	 */
-	public void registerUser(String username, String password, String email) {
-		//TODO Add Register User Code.
-		int tmp;
-		String response = "";
+	public void registerUser(final String username, final String password, final String email) {
+
 		Routes URL = new Routes();
 
-		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-		StrictMode.setThreadPolicy(policy);
+		// Request a string response from the provided URL.
+		StringRequest stringRequest = new StringRequest(Request.Method.POST, URL.getRegisterURL(),
+				new Response.Listener<String>() {
+					@Override
+					public void onResponse(String response) {
+						// Display the response from the server
+						try {
+							JSONObject JSONresponse = new JSONObject(response);
 
-		try {
-			URL url = new URL(URL.getRegisterURL());
-			String urlParams = "username=" + username + "&password=" + password + "&email=" + email;
+							//IF the request is successful, do this:
+							if (!JSONresponse.getBoolean("error")) {
+								Intent intent = new Intent("com.toastabout.test_securechat.LoginActivity");
+								intent.putExtra("username", JSONresponse.getString("username"));
+								startActivity(intent);
+							}
+							else {
+								Toast.makeText(RegisterActivity.this, JSONresponse.getString("error_msg"), Toast.LENGTH_SHORT).show();
+							}
+						}
+						catch (JSONException e) {
+							Toast.makeText(RegisterActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+						}
 
-			//set up HTTP Connection
-			HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-			httpURLConnection.setDoOutput(true);
-			OutputStream os = httpURLConnection.getOutputStream();
-			os.write(urlParams.getBytes());
-			os.flush();
-			os.close();
 
-			//get input from server and store into variable.
-			//if credentials are correct, will return a jwt
-			InputStream is = httpURLConnection.getInputStream();
-			while((tmp = is.read()) != -1){
-				response += (char)tmp;
+					}//END ON_RESPPNSE
+				},//END RESPONSE LISTENER
+				new Response.ErrorListener() {
+					@Override
+					public void onErrorResponse(VolleyError error) {
+						Toast.makeText(RegisterActivity.this, "That didn't work!", Toast.LENGTH_SHORT).show();
+					}
+				})
+		{
+			@Override
+			protected HashMap<String, String> getParams()
+			{
+				HashMap<String, String> params = new HashMap<>();
+				params.put("username", username);
+				params.put("password", password);
+				params.put("email", email);
+				return params;
 			}
+		};
 
-			//close input stream and disconnect connection
-			is.close();
-			httpURLConnection.disconnect();
-
-			//output response for debugging purposes
-			TextView token = (TextView) findViewById(R.id.token);
-			token.setText(response);
-
-			//if login is successful, send user to Inbox
-			Toast.makeText(this, "Registration Successful!", Toast.LENGTH_SHORT).show();
-			Intent intent = new Intent("com.toastabout.test_securechat.LoginActivity");
-			startActivity(intent);
-
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
+		MySingleton.getInstance(this).addToRequestQueue(stringRequest);
 	}//END registerUser
 
 

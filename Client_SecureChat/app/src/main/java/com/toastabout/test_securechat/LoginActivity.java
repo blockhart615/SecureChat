@@ -84,6 +84,13 @@ public class LoginActivity extends AppCompatActivity {
 		});
 
 
+		Bundle extras = getIntent().getExtras();
+		if (extras != null) {
+			String username = extras.getString("username");
+			EditText usernameField = (EditText) findViewById(R.id.username);
+			usernameField.setText(username);
+		}
+
 	}
 
 
@@ -97,68 +104,45 @@ public class LoginActivity extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        // Display the first 500 characters of the response string.
-                        Toast.makeText(LoginActivity.this, "Response is: " + response, Toast.LENGTH_SHORT).show();
-                    }
-                },
+                        // Display the resposne from the server
+						try {
+							JSONObject JSONresponse = new JSONObject(response);
+							if (!JSONresponse.getBoolean("error")) {
+								//if login is successful, send user to Inbox
+								String jwt = JSONresponse.getString("jwt");
+								Intent intent = new Intent("com.toastabout.test_securechat.InboxActivity");
+								intent.putExtra("jwt", jwt);
+								startActivity(intent);
+							}
+							else {
+								Toast.makeText(LoginActivity.this, JSONresponse.getString("error_msg"), Toast.LENGTH_SHORT).show();
+							}
+						}
+						catch (JSONException e) {
+							Toast.makeText(LoginActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+						}
+
+
+                    }//END ON_RESPPNSE
+                },//END RESPONSE LISTENER
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Toast.makeText(LoginActivity.this, "That didn't work!", Toast.LENGTH_SHORT).show();
                     }
-                }
-        )
-        {
-            @Override
-            protected HashMap<String, String> getParams()
-            {
-                HashMap<String, String> params = new HashMap<>();
-                params.put("username", username);
-                params.put("password", password);
-                return params;
-            }
-        };
+                })
+			{
+				@Override
+				protected HashMap<String, String> getParams()
+				{
+					HashMap<String, String> params = new HashMap<>();
+					params.put("username", username);
+					params.put("password", password);
+					return params;
+				}
+			};
 
 		MySingleton.getInstance(this).addToRequestQueue(stringRequest);
-
-
-
-//		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-//		StrictMode.setThreadPolicy(policy);
-//
-////		try {
-////			URL url = new URL(URL.getLoginURL());
-////			String urlParams = "username="+username+"&password="+password;
-////
-////			//set up HTTP Connection
-////			HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-////			httpURLConnection.setDoOutput(true);
-////			OutputStream os = httpURLConnection.getOutputStream();
-////			os.write(urlParams.getBytes());
-////			os.flush();
-////			os.close();
-////
-////			//get input from server and store into variable.
-////			//if credentials are correct, will return a jwt
-////			InputStream is = httpURLConnection.getInputStream();
-////			while((tmp = is.read()) != -1){
-////				jwt += (char)tmp;
-////			}
-////
-////			//close input stream and disconnect connection
-////			is.close();
-////			httpURLConnection.disconnect();
-////
-////
-////			//if login is successful, send user to Inbox
-////			Intent intent = new Intent("com.toastabout.test_securechat.InboxActivity");
-////			intent.putExtra("jwt", jwt);
-////			startActivity(intent);
-////
-////		}
-////		catch (Exception e) {
-////			e.printStackTrace();
-////		}
 
 	}
 
