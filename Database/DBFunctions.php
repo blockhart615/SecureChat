@@ -103,6 +103,24 @@ class DBFunctions
         }
     }
 
+    public function emailExists($email) {
+                //prepare statements to protect against SQL injections
+        $stmt = $this->conn->prepare("SELECT email from users WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $stmt->store_result();
+
+        //if there is more than 0 rows, then there is an existing user
+        if ($stmt->num_rows > 0) {
+            $stmt->close();
+            return true;
+        } else {
+            // user doesn't exist
+            $stmt->close();
+            return false;
+        }
+    }
+
     /**
      * Encrypting password
      * @param password

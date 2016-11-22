@@ -1,6 +1,7 @@
 package com.toastabout.test_securechat;
 
 import android.content.Intent;
+import android.content.IntentSender;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.design.widget.FloatingActionButton;
@@ -98,9 +99,14 @@ public class RegisterActivity extends AppCompatActivity {
 
 							//IF the request is successful, do this:
 							if (!JSONresponse.getBoolean("error")) {
-								Intent intent = new Intent("com.toastabout.test_securechat.LoginActivity");
-								intent.putExtra("username", JSONresponse.getString("username"));
-								startActivity(intent);
+								try {
+									Intent intent = new Intent("com.toastabout.test_securechat.LoginActivity");
+									intent.putExtra("username", JSONresponse.getString("username"));
+									startActivity(intent);
+								}
+								catch (Exception e) {
+									Toast.makeText(RegisterActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+								}
 							}
 							else {
 								Toast.makeText(RegisterActivity.this, JSONresponse.getString("error_msg"), Toast.LENGTH_SHORT).show();
@@ -111,7 +117,7 @@ public class RegisterActivity extends AppCompatActivity {
 						}
 
 
-					}//END ON_RESPPNSE
+					}//END ON_RESPPONSE
 				},//END RESPONSE LISTENER
 				new Response.ErrorListener() {
 					@Override

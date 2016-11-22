@@ -17,9 +17,17 @@ if (isset($_POST['username']) && isset($_POST['email']) && isset($_POST['passwor
       // If user already exists, display error message.
         $response["error"] = true;
         $response["error_msg"] = "Username " . $username . " already exists. Please pick another username.";
-        echo json_encode($resposne);
+        echo json_encode($response);
     }
 
+    //IF EMAIL IS ALREADY ASSOCIATED WITH A USER
+    else if ($db->emailExists($email)) {
+        $response["error"] = true;
+        $response["error_msg"] = "An account with " . $email . " already exists. Please use another email address.";
+        echo json_encode($response);
+    }
+
+    //NO ERROR - CREATE NEW USER
 	else {
         // create a new user
         $user = $db->storeUser($username, $email, $password);
@@ -46,6 +54,6 @@ if (isset($_POST['username']) && isset($_POST['email']) && isset($_POST['passwor
 else {
 	$response["error"] = true;
     $response["error_msg"] = "Required parameters (username, email or password) missing.";
-    echo json_encode($resposne);
+    echo json_encode($response);
 }
 ?>
