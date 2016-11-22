@@ -17,8 +17,8 @@ public class Routes {
 	public String getRegisterURL() {
 		return REGISTER;
 	}
-	public String getGetMessagesURL() {
-		return GET_MESSAGES;
+	public String getGetMessagesURL(String username) {
+		return GET_MESSAGES + "/?receiver=" + username;
 	}
 	public String getPostMessagesURL() {
 		return POST_MESSAGE;

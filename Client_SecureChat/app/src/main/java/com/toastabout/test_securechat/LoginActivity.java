@@ -112,6 +112,7 @@ public class LoginActivity extends AppCompatActivity {
 								String jwt = JSONresponse.getString("jwt");
 								Intent intent = new Intent("com.toastabout.test_securechat.InboxActivity");
 								intent.putExtra("jwt", jwt);
+								intent.putExtra("username", username);
 								startActivity(intent);
 							}
 							else {

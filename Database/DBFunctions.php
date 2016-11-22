@@ -176,11 +176,12 @@ class DBFunctions
         if ($stmt->execute()) {
 
             //ARRAY OF ASSOCIATIVE ARRAYS
-            $conversations;
+            $conversations = null;
             $convo = "";
 
             $result = $stmt->get_result();
             if ($result->num_rows > 0) {
+
                 while ($row = $result->fetch_assoc()) {
                     //get message contents into an associative array
                     $sender   = $row['sender'];
@@ -213,20 +214,26 @@ class DBFunctions
                     }            
 
                 } //END WHILE LOOP
+
+                $response["conversations"] = $conversations;
+                $response["error"] = false;
+                $response["error_msg"] = "No errors!";
+
             } //IF AT LEAST ONE ROW
             else {
-                $conversations["error"] = true;
-                $conversations["error_msg"] = "No messages to read.";
+                $response["error"] = true;
+                $response["error_msg"] = "No messages to read.";
             }
         } 
 
         //Unknown Error
         else {
-            $conversations["error"] = true;
-            $conversations["error_msg"] = "Statement execution unsuccessful.";            
+            $response["error"] = true;
+            $response["error_msg"] = "Statement execution unsuccessful.";            
         }
         $stmt->close();
 
-        return json_encode($conversations);
+        
+        return json_encode($response);
     }//END Function getMessages()
 }
