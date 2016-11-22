@@ -167,8 +167,7 @@ class DBFunctions
     /*
      * Receives messages from the database
      */
-    public function getMessages($username)
-    {
+    public function getMessages($username) {
         //prepare statements to protect against SQL injections
         $stmt = $this->conn->prepare("SELECT * FROM messages WHERE receiver = ? OR sender = ? ORDER BY time_sent");
         $stmt->bind_param("ss", $username, $username);
@@ -178,7 +177,7 @@ class DBFunctions
 
             //ARRAY OF ASSOCIATIVE ARRAYS
             $conversations;
-            $convo           = "";
+            $convo = "";
 
             $result = $stmt->get_result();
             if ($result->num_rows > 0) {
@@ -194,7 +193,7 @@ class DBFunctions
                         'message'   => $message,
                         'time_sent' => $timeSent
                     );
-                    // $jwtMessage = json_encode($message) . "\n\n";
+                    $jwtMessage = json_encode($message);
 
                     //TO GET AN INDIVIDUAL CONVERSATION
                     if ($username != $sender) {
@@ -203,38 +202,31 @@ class DBFunctions
                     	$convo = $receiver;
                     }
 
-
+                    //ADD NEW MESSAGE TO CONVERSATION
                     if(array_key_exists($convo, $conversations)) {
-                    	//ADD NEW MESSAGE TO CONVERSATION
-                    	array_push($conversations[$convo], $message);
+                    	array_push($conversations[$convo], $jwtMessage);
 
                     }
+                    //CREATE NEW CONVERSATION
                     else {
-                    	//CREATE NEW CONVERSATION
-                    	$conversations[$convo] = array($message);
+                    	$conversations[$convo] = array($jwtMessage);
                     }            
 
                 } //END WHILE LOOP
-
-                //output the conversations
-                foreach ($conversations as $convo => $messageThread) {
-                    echo "CONVERSATION WITH " . $convo . ":\n";
-                    foreach ($messageThread as $individual_message) {
-                    	echo "sender: " . $individual_message['sender'] . "\n";
-                    	echo "receiver: " . $individual_message['receiver'] . "\n";
-                        echo "message: " . $individual_message['message'] . "\n";
-                        echo $individual_message['time_sent'] . "\n\n";
-                    }
-                    echo "\n\n";
-                }
-            } else {
-                echo "No messages to read.";
+            } //IF AT LEAST ONE ROW
+            else {
+                $conversations["error"] = true;
+                $conversations["error_msg"] = "No messages to read.";
             }
-        } else {
-            echo "Statement execution unsuccessful.\n";
+        } 
+
+        //Unknown Error
+        else {
+            $conversations["error"] = true;
+            $conversations["error_msg"] = "Statement execution unsuccessful.";            
         }
         $stmt->close();
-        return true;
-    }
 
+        return json_encode($conversations);
+    }//END Function getMessages()
 }

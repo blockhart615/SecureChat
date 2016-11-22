@@ -14,32 +14,17 @@
     tools:context="com.toastabout.test_securechat.InboxActivity"
     tools:showIn="@layout/activity_inbox">
 
-    <TextView
-        android:text="Future Inbox!"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="31dp"
-        android:id="@+id/text"
-        android:textSize="48sp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"/>
+    <android.support.v4.widget.SwipeRefreshLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/swiperefresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <TextView
-        android:text="Here is your token: "
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView3"
-        android:layout_marginTop="70dp"
-        android:layout_below="@+id/text"
-        android:layout_alignLeft="@+id/text"
-        android:layout_alignStart="@+id/text"/>
+        <ListView
+            android:id="@+id/list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
-    <TextView
-        android:text="token"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/token"
-        android:layout_below="@+id/textView3"
-        android:layout_alignLeft="@+id/textView3"
-        android:layout_alignStart="@+id/textView3"/>
+    </android.support.v4.widget.SwipeRefreshLayout>
+
 </RelativeLayout>

@@ -10,6 +10,7 @@ if (isset($_GET["receiver"]) && $db->userExists($_GET["receiver"])) {
 
 
 	$messages = $db->getMessages($user);
+	echo $messages;
 
 	// foreach ($messages as $value) {
 	// 	echo "Message: " . $value;

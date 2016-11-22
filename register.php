@@ -37,7 +37,6 @@ if (isset($_POST['username']) && isset($_POST['email']) && isset($_POST['passwor
             $response["error"] = false;
             $response["username"] = $user['username'];
             $response["email"] = $user['email'];
-            $response["created_at"] = $user['created_at'];
             echo json_encode($response);
         }//IF USER CREATION SUCCESSFUL
 
