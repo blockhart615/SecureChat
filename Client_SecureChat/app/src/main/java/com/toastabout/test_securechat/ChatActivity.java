@@ -10,9 +10,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
+
+import java.util.Date;
 
 public class ChatActivity extends AppCompatActivity {
 
@@ -23,32 +26,34 @@ public class ChatActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             String friend = extras.getString("friend");
             String messages = extras.getString("messages");
+            String sender = "", receiver = "", message = "", timeStamp = "";
+            JSONObject messageObject = null;
 
-            TextView friendName = (TextView) findViewById(R.id.friend_name);
+            toolbar.setTitle(friend);
             TextView messageTxt = (TextView) findViewById(R.id.messages);
-
-            friendName.setText(friend);
-            messageTxt.setText(messages);
+//            messageTxt.setText(messages);
 
             //convert string messages into JSON objects
             try {
-                JSONObject JSONmessages = new JSONObject(messages);
+                JSONArray JSONmessages = new JSONArray(messages);
+                for (int i = 0; i < JSONmessages.length(); i++) {
+                    String JSONString = JSONmessages.getString(i);
+                    messageObject = new JSONObject(JSONString);
+                    sender = messageObject.getString("sender");
+                    message = messageObject.getString("message");
+                    timeStamp = messageObject.getString("time_sent");
+
+                    messageTxt.append(sender + ":\n" + message + "\n" + timeStamp + "\n\n");
+                }
             }
             catch (JSONException e) {
-                Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                messageTxt.setText(e.getMessage());
+                e.printStackTrace();
             }
 
         }

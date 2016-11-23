@@ -73,8 +73,8 @@ public class InboxActivity extends AppCompatActivity {
 
 					Intent intent = new Intent("com.toastabout.test_securechat.ChatActivity");
 					try {
-						String messages = JSONresponse.getJSONObject("conversations").getString(friend);
-						intent.putExtra("messages", messages);
+						JSONArray messages = JSONresponse.getJSONObject("conversations").getJSONArray(friend);
+						intent.putExtra("messages", messages.toString());
 					}
 					catch (JSONException e) {
 						Toast.makeText(InboxActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
