@@ -44,7 +44,7 @@ public class InboxActivity extends AppCompatActivity {
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
 			//gets token and username from previous activity
-			String jwt = extras.getString("jwt");
+			final String jwt = extras.getString("jwt");
 			final String username = extras.getString("username");
 
 
@@ -81,6 +81,7 @@ public class InboxActivity extends AppCompatActivity {
 					}
 
 					intent.putExtra("friend", friend);
+					intent.putExtra("jwt", jwt);
 					startActivity(intent);
 				}
 			});

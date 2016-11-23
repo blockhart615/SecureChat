@@ -10,6 +10,7 @@ define('SECRET_KEY','Your-Secret-Key');
 
 //instantiate DBFunctions object to perform queries and operations on Database.
 $db = new DBFunctions();
+$response["error"] = false;
 
 if (isset($_POST['message-to-send']) && isset($_POST['recipient'])) {
 
@@ -32,15 +33,20 @@ if (isset($_POST['message-to-send']) && isset($_POST['recipient'])) {
 	if ($db->userExists($receiver) && $db->userExists($sender) && $message != NULL) {
 		//sends the message to the database
 		$db->sendMessage($sender, $receiver, $message);
-		echo "Message sent successfully!\n";
+		$response["error_msg"] = "Message sent successfully!";
+		echo json_encode($response);
 	}
 	//if user is not found in database, output error message
 	if (!($db->userExists($receiver))){
-		echo "That user does not exist in our database. Check the recpient's username.";
+		$response["error"] = true;
+		$response["error_msg"] = "That user does not exist in our database. Check the recpient's username.";
+		echo json_encode($response);
 	}
 	//if sender tries to send a blank message
 	if ($message == NULL) {
-		echo 'No message to send. Enter a message to send and try again.';
+		$response["error"] = true;
+		$response["error_msg"] = 'No message to send. Enter a message to send and try again.';
+		echo json_encode($response);
 	}
 }
 ?>
