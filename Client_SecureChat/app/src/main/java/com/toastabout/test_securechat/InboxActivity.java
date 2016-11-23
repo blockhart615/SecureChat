@@ -8,6 +8,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -30,6 +31,8 @@ import java.util.List;
 
 public class InboxActivity extends AppCompatActivity {
 
+	private static JSONObject JSONresponse;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -37,41 +40,52 @@ public class InboxActivity extends AppCompatActivity {
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
 
-		FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-		fab.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-						.setAction("Action", null).show();
-			}
-		});
-
-
 		//ONLY CALL THIS IF RECEIVED JWT
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
-
 			//gets token and username from previous activity
 			String jwt = extras.getString("jwt");
 			final String username = extras.getString("username");
+
+
+			final ListView lv = (ListView) findViewById(R.id.list);
+			final ArrayList<String> conversations = new ArrayList<>();
+
+
+			//Get messages when screen loads
+			getConversations(username, lv, conversations);
 
 			//swipe down to refresh, I.E. get messages from the server.
 			final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swiperefresh);
 			swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 				@Override
 				public void onRefresh() {
-					getMessages(username);
+					getConversations(username, lv, conversations);
 					swipeRefreshLayout.setRefreshing(false);
 				}
 			});
 
+			//Add on click listener to list view to get desired conversation
+			lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+				@Override
+				public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+					String friend = (String) lv.getItemAtPosition(i);
 
-			//Get messages when screen loads
-			getMessages(username);
+					Intent intent = new Intent("com.toastabout.test_securechat.ChatActivity");
+					try {
+						String messages = JSONresponse.getJSONObject("conversations").getString(friend);
+						intent.putExtra("messages", messages);
+					}
+					catch (JSONException e) {
+						Toast.makeText(InboxActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+					}
+
+					intent.putExtra("friend", friend);
+					startActivity(intent);
+				}
+			});
+
 		}
-
-
-
 
 	}
 
@@ -79,28 +93,15 @@ public class InboxActivity extends AppCompatActivity {
 	/**
 	 * getMessages performs the request to get the conversations from the server
 	 */
-	public void getMessages(String username) {
-		//TODO Implement GET messages
-		Toast.makeText(this, "GETTING NEW MESSAGES!", Toast.LENGTH_SHORT).show();
-
-		final ListView lv = (ListView) findViewById(R.id.list);
-
-		// Instanciating an array list (you don't need to do this,
-		// you already have yours).
-		final ArrayList<String> conversations = new ArrayList<>();
-
-		// This is the array adapter, it takes the context of the activity as a
-		// first parameter, the type of list view as a second parameter and your
-		// array as a third parameter.
-		final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
-				this,
-				android.R.layout.simple_list_item_1,
-				conversations);
-
-
+	public void getConversations(String username, final ListView lv, final ArrayList<String> conversations) {
 
 		Routes URL = new Routes();
-		
+
+		// This is the array adapter, it takes the context of the activity as a first parameter,
+		// the type of list view as a second parameter and your array as a third parameter.
+		final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, conversations);
+
+
 		//STRING REQUEST TO GET MESSAGES FROM SERVER
 		StringRequest stringRequest = new StringRequest(Request.Method.GET, URL.getGetMessagesURL(username),
 				new Response.Listener<String>() {
@@ -109,13 +110,16 @@ public class InboxActivity extends AppCompatActivity {
 
 						// GET the response from the server
 						try {
-							JSONObject JSONresponse = new JSONObject(response);
+							JSONresponse = new JSONObject(response);
 							JSONObject JSONconvos = JSONresponse.getJSONObject("conversations");
 							Iterator<String> iter = JSONconvos.keys();
 							while (iter.hasNext()) {
-								conversations.add(iter.next());
+								String next = iter.next();
+								if (!conversations.contains(next))
+									conversations.add(next);
 							}
 							lv.setAdapter(arrayAdapter);
+
 
 							//IF NO ERRORS, DO THIS!
 							if (!JSONresponse.getBoolean("error")) {
@@ -154,17 +158,4 @@ public class InboxActivity extends AppCompatActivity {
 
 	}
 
-	/**
-	 *
-	 */
-	public void getConversations() {
-
-	}
-
-	/**
-	 *
-	 */
-	public void enterConversation() {
-
-	}
 }
