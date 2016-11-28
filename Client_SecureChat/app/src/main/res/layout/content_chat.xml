@@ -24,7 +24,8 @@
         android:id="@+id/message_txt"
         android:layout_toLeftOf="@+id/send"
         android:layout_toStartOf="@+id/send"
-        android:hint="..." />
+        android:hint="..."
+        android:layout_below="@+id/scroll_view" />
 
     <Button
         android:text="Send"
@@ -41,6 +42,7 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/send"
         android:id="@+id/scroll_view">
+
 
         <LinearLayout
             android:layout_width="match_parent"

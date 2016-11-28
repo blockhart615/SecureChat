@@ -8,10 +8,6 @@ import com.android.volley.toolbox.Volley;
 import android.graphics.Bitmap;
 import android.util.LruCache;
 
-/**
- * Created by Brett on 11/17/2016.
- */
-
 public class MySingleton {
     private static MySingleton mInstance;
     private RequestQueue mRequestQueue;

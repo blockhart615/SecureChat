@@ -1,9 +1,6 @@
 package com.toastabout.test_securechat;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -13,21 +10,16 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
-
-import java.util.Date;
-import java.util.HashMap;
 
 public class ChatActivity extends AppCompatActivity {
+
+    ServerRequest requester = new ServerRequest();
+    String friend, jwt;
+    String sender, message, timeStamp;
+    JSONObject messageObject;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,26 +28,21 @@ public class ChatActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        ScrollView scrollView = (ScrollView) findViewById(R.id.scroll_view);
-        scrollView.fullScroll(View.FOCUS_DOWN);
-
-
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             //get extras from previous activity
-            final String friend = extras.getString("friend");
-            String messages = extras.getString("messages");
-            final String jwt = extras.getString("jwt");
+            friend = extras.getString("friend");
+            String chatMessages = extras.getString("messages");
+            jwt = extras.getString("jwt");
 
 
-            String sender, message, timeStamp;
-            JSONObject messageObject;
             toolbar.setTitle(friend);
-            TextView conversation = (TextView) findViewById(R.id.messages);
+            final TextView conversation = (TextView) findViewById(R.id.messages);
+
             //convert string messages into JSON objects Build out messages on app
             try {
-                JSONArray JSONmessages = new JSONArray(messages);
+                JSONArray JSONmessages = new JSONArray(chatMessages);
                 for (int i = 0; i < JSONmessages.length(); i++) {
                     String JSONString = JSONmessages.getString(i);
                     messageObject = new JSONObject(JSONString);
@@ -84,73 +71,24 @@ public class ChatActivity extends AppCompatActivity {
                         Toast.makeText(ChatActivity.this, "Message is empty, write some text!", Toast.LENGTH_SHORT).show();
                     }
                     else {
-                        sendMessage(messageString, friend, jwt);
+                        requester.sendMessage(messageString, friend, jwt, ChatActivity.this);
                         messageTxt.setText("");
-
                     }
                 }
             });
 
-        }
-
-    }
+        }//END if Bundle Extras
 
 
-
-    public void sendMessage(final String message, final String receiver, final String jwt) {
-        Routes URL = new Routes();
-
-
-        // Request a string response from the provided URL.
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, URL.getPostMessagesURL(),
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        // Display the resposne from the server
-                        try {
-                            JSONObject JSONresponse = new JSONObject(response);
-                            String responseMsg = JSONresponse.getString("error_msg");
-
-                            //if no error
-                            if (!JSONresponse.getBoolean("error")) {
-                                Toast.makeText(ChatActivity.this, responseMsg, Toast.LENGTH_SHORT).show();
-                            }
-                            //some error occurred
-                            else {
-                                Toast.makeText(ChatActivity.this, responseMsg, Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                        catch (JSONException e) {
-                            Toast.makeText(ChatActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-
-
-                    }//END ON_RESPPNSE
-                },//END RESPONSE LISTENER
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(ChatActivity.this, "That didn't work!", Toast.LENGTH_SHORT).show();
-                    }
-                })
-        {
+        final ScrollView scrollview = ((ScrollView) findViewById(R.id.scroll_view));
+        scrollview.post(new Runnable() {
             @Override
-            protected HashMap<String, String> getParams()
-            {
-                HashMap<String, String> params = new HashMap<>();
-                params.put("message-to-send", message);
-                params.put("recipient", receiver);
-                return params;
+            public void run() {
+                scrollview.scrollTo(0, scrollview.getBottom());
             }
-            @Override
-            public HashMap<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                headers.put("Authorization", jwt);
-                return headers;
-            }
-        };
+        });
 
-        MySingleton.getInstance(this).addToRequestQueue(stringRequest);
-    }
 
-}
+    }//END onCreate
+
+}//END ChatActivity
