@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -24,9 +23,8 @@ public class ChatActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+
         listView = (ListView) findViewById(R.id.list_view);
-
-
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -35,7 +33,11 @@ public class ChatActivity extends AppCompatActivity {
             jwt = extras.getString("jwt");
             username = extras.getString("username");
 
-            toolbar.setTitle(friend);
+            //update toolbar title to friend's name
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setTitle("Conversation With " + friend +":");
+            }
+
             requester.getChat(username, friend, listView, ChatActivity.this);
 
 
@@ -51,7 +53,6 @@ public class ChatActivity extends AppCompatActivity {
                         Toast.makeText(ChatActivity.this, "Message is empty, write some text!", Toast.LENGTH_SHORT).show();
                     }
                     else {
-                        TextView tv = new TextView(ChatActivity.this);
                         requester.sendMessage(messageString, friend, jwt, ChatActivity.this);
                         messageTxt.setText("");
                     }

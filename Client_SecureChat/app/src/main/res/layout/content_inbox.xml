@@ -23,7 +23,10 @@
         <ListView
             android:id="@+id/list"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:divider="@color/colorPrimary"
+            android:dividerHeight="2dp"
+            android:footerDividersEnabled="false" />
 
     </android.support.v4.widget.SwipeRefreshLayout>
 

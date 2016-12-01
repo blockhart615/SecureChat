@@ -5,4 +5,5 @@
     <string name="title_activity_register">RegisterActivity</string>
     <string name="title_activity_inbox">InboxActivity</string>
     <string name="title_activity_chat">ChatActivity</string>
+    <string name="title_activity_main">MainActivity</string>
 </resources>

@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -17,10 +16,25 @@ import com.android.volley.toolbox.StringRequest;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.spongycastle.util.encoders.Base64;
 
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.KeyFactory;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.Security;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 
 public class RequestHandler {
@@ -29,8 +43,14 @@ public class RequestHandler {
     private final String REGISTER_URL = "https://toastabout.com/SecureChat/register.php";
     private final String GET_MESSAGES_URL = "https://toastabout.com/SecureChat/GetMessage.php";
     private final String POST_MESSAGE_URL = "https://toastabout.com/SecureChat/SendMessage.php";
+    private final String ALGORITHM = "RSA";
 
     private JSONObject loginResponse, registerResponse, getMessageResponse, postMessageResponse;
+
+    //SpongyCastle security provider.
+    static {
+        Security.insertProviderAt(new org.spongycastle.jce.provider.BouncyCastleProvider(), 1);
+    }
 
 
     /**
@@ -184,21 +204,20 @@ public class RequestHandler {
                         // GET the response from the server
                         try {
                             getMessageResponse = new JSONObject(response);
-                            JSONObject JSONconvos = getMessageResponse.getJSONObject("conversations");
-                            Iterator<String> iter = JSONconvos.keys();
-                            while (iter.hasNext()) {
-                                String next = iter.next();
-                                if (!conversations.contains(next))
-                                    conversations.add(next);
-                            }
-                            lv.setAdapter(arrayAdapter);
 
                             //IF NO ERRORS, DO THIS!
                             if (!getMessageResponse.getBoolean("error")) {
-
+                                JSONObject JSONconvos = getMessageResponse.getJSONObject("conversations");
+                                Iterator<String> iter = JSONconvos.keys();
+                                while (iter.hasNext()) {
+                                    String next = iter.next();
+                                    if (!conversations.contains(next))
+                                        conversations.add(next);
+                                }
+                                lv.setAdapter(arrayAdapter);
                             }
-                            //DISPLAY ERROR MESSAGE
                             else {
+                                //DISPLAY ERROR MESSAGE from server
                                 Toast.makeText(context, getMessageResponse.getString("error_msg"), Toast.LENGTH_SHORT).show();
                             }
                         }
@@ -310,7 +329,6 @@ public class RequestHandler {
                             final String receiver,
                             final String jwt,
                             final Context context) {
-
 
         // Request a string response from the provided URL.
         StringRequest stringRequest = new StringRequest(Request.Method.POST, POST_MESSAGE_URL,
