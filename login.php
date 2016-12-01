@@ -26,7 +26,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
         //build JSON Web Token
         $tokenID = base64_encode(mcrypt_create_iv(32));
         $issuedAt = time();
-        $notBefore = $issuedAt + 10; //add 10 seconds
+        $notBefore = $issuedAt + 2; //add 10 seconds
         $expireTime = $notBefore + 180; //3 minutes after not before
         $serverName = 'https://www.toastabout.com';
 

@@ -1,8 +1,6 @@
 package com.toastabout.test_securechat;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -12,7 +10,7 @@ import android.widget.Toast;
 
 public class RegisterActivity extends AppCompatActivity {
 
-	ServerRequest requester = new ServerRequest();
+	RequestHandler requester = new RequestHandler();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -22,14 +20,6 @@ public class RegisterActivity extends AppCompatActivity {
 		setSupportActionBar(toolbar);
 
 
-		FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-		fab.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-						.setAction("Action", null).show();
-			}
-		});
 
 		Button registerBtn = (Button) findViewById(R.id.register_btn);
 		registerBtn.setOnClickListener(new View.OnClickListener() {

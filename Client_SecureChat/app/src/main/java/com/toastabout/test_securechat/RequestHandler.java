@@ -2,8 +2,10 @@ package com.toastabout.test_securechat;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -12,6 +14,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -20,7 +23,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 
-public class ServerRequest {
+public class RequestHandler {
     // Server user login url
     private final String LOGIN_URL = "https://toastabout.com/SecureChat/login.php";
     private final String REGISTER_URL = "https://toastabout.com/SecureChat/register.php";
@@ -29,19 +32,17 @@ public class ServerRequest {
 
     private JSONObject loginResponse, registerResponse, getMessageResponse, postMessageResponse;
 
+
     /**
      * Get the URL for the GET parameter
-     * @param username
-     * @return
+     * @param username user making the request
+     * @return GET parameters for request
      */
     private String getGetMessagesURL(String username) {
         return GET_MESSAGES_URL+"/?receiver="+username;
     }
 
-//    public JSONObject getLoginResponse() {return loginResponse;}
-//    public JSONObject getRegisterResponse() {return registerResponse;}
-    public JSONObject getGetMessageResponse() {return getMessageResponse;}
-//    public JSONObject getPostMessageResponse() {return postMessageResponse;}
+    public JSONObject getGETresponse() {return getMessageResponse;}
 
     /**
      * Send request to server to log in
@@ -192,7 +193,6 @@ public class ServerRequest {
                             }
                             lv.setAdapter(arrayAdapter);
 
-
                             //IF NO ERRORS, DO THIS!
                             if (!getMessageResponse.getBoolean("error")) {
 
@@ -221,6 +221,83 @@ public class ServerRequest {
         MySingleton.getInstance(context).addToRequestQueue(stringRequest);
     }
 
+
+	/**
+     * Get chat messages for a specific conversation
+     * @param username username of user getting messages
+     * @param friend name of person user is having conversation with
+     * @param listView listview that is adapted with the messages
+     * @param context context of the chat activity
+     */
+    public void getChat(final String username,
+                        final String friend,
+                        final ListView listView,
+                        final Context context) {
+
+        //STRING REQUEST TO GET MESSAGES FROM SERVER
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, getGetMessagesURL(username),
+                new Response.Listener<String>() {
+
+                    @Override
+                    public void onResponse(String response) {
+
+                        String sender, message, timeStamp;
+                        JSONObject messageObject;
+                        ArrayList<String> chatMessages = new ArrayList<>();
+
+                        try {
+                            //make JSON object from response and get conversations
+                            JSONObject chatResponse = new JSONObject(response);
+                            JSONObject JSONconvos = chatResponse.getJSONObject("conversations");
+                            JSONArray jsonConversation = JSONconvos.getJSONArray(friend);
+
+                            //Loop thorugh JSONArray to get each message
+                            for (int i = 0; i < jsonConversation.length(); i++) {
+                                String JSONString = jsonConversation.getString(i);
+                                messageObject = new JSONObject(JSONString);
+
+                                //get data from JSON message
+                                sender = messageObject.getString("sender");
+                                message = messageObject.getString("message");
+                                timeStamp = messageObject.getString("time_sent");
+                                String messageString = sender + ":\n" + message + "\n" + timeStamp;
+
+                                //add message to arraylist if it isn't already in the list
+                                if (!chatMessages.contains(messageString)){
+                                    chatMessages.add(messageString);
+                                }
+                            }
+
+                            //make array adapter for listView of messages and set adapter to list view
+                            final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, chatMessages);
+                            listView.setAdapter(arrayAdapter);
+
+                            listView.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    // Select the last row so it will scroll into view...
+                                    listView.setSelection(arrayAdapter.getCount() - 1);
+                                }
+                            });
+
+                        }
+                        catch (JSONException e) {
+                            Log.w("JSONException: ", e.getMessage());
+                        }
+
+                    }//END ON_RESPONSE
+                },//END RESPONSE LISTENER
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.w("VolleyError", error.getMessage());
+                    }
+                }
+        );
+
+        //add response to queue to be sent to server
+        MySingleton.getInstance(context).addToRequestQueue(stringRequest);
+    }
 
     /**
      * POST request sends message to the server
