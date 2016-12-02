@@ -1,5 +1,6 @@
 /**
- * RSA used for key transport
+ * use RSA for key transport
+ * use AES for message encryption
  * use HMAC-SHA256 for message integrity, etc
  */
 
@@ -10,8 +11,6 @@ import android.util.Log;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
 
 import javax.crypto.Cipher;
 
@@ -27,12 +26,12 @@ public class RSACipher {
 	private Cipher cipher;
 
 	public RSACipher() {
-		//Initialize class variables
+		//PUBLIC KEY INITIALIZATIONS
 		try {
 			keyGen = KeyPairGenerator.getInstance(RSA_ALGORITHM);
 			keyGen.initialize(2048);
 			keyPair = keyGen.generateKeyPair();
-			cipher = Cipher.getInstance("RSA/NONE/OAEPWithSHA256AndMGF1Padding");
+			cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 		}
 		catch (Exception e) {
 			Log.d("No Such Algorithm: ", e.getMessage());
@@ -72,16 +71,12 @@ public class RSACipher {
 		}
 	}
 
-	/**
-	 * Get the private key for decrypting
-	 * @return the private key
-	 */
-	public PrivateKey getPrivateKey() {
-		return keyPair.getPrivate();
+	public void AESEncrypt() {
+
 	}
 
-	public PublicKey getPublicKey() {
-		return keyPair.getPublic();
+	public void AESDecrypt() {
+
 	}
 
 
