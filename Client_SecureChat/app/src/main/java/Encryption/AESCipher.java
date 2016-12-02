@@ -1,7 +1,7 @@
 package Encryption;
 
 /**
- * Created by Brett on 12/1/2016.
+ * use AES for message encryption
  */
 
 import android.util.Log;
@@ -26,22 +26,23 @@ import org.apache.commons.codec.binary.Base64;
 public class AESCipher {
 	private Cipher cipher;
 	private Base64 base64;
+	private SecretKey secretKey;
 	private int passwordLength;
 	private int saltLength;
-	private int initializationVectorSeedLength;
+	private int IVSeedLength;
 
 	public AESCipher() throws NoSuchAlgorithmException, NoSuchPaddingException {
 		this(new Base64(), 16, 16, 16);
 	}
 
-		public AESCipher(Base64 base64, int passwordLength, int saltLength, int initializationVectorSeedLength)
-				throws NoSuchAlgorithmException, NoSuchPaddingException {
+	public AESCipher(Base64 base64, int passwordLength, int saltLength, int IVSeedLength)
+			throws NoSuchAlgorithmException, NoSuchPaddingException {
 
 			try {
 				this.base64 = base64;
 				this.passwordLength = passwordLength;
 				this.saltLength = saltLength;
-				this.initializationVectorSeedLength = initializationVectorSeedLength;
+				this.IVSeedLength = IVSeedLength;
 				cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
 				}
 			catch (NoSuchAlgorithmException e) {
@@ -53,43 +54,39 @@ public class AESCipher {
 
 		}
 
-	/**
-	 *
-	 */
-	private SecretKey secretKey;
+
 
 	/**
 	 *
-	 * @return
+	 * @return the Secret Key
 	 */
 	public SecretKey getSecretKey() {
 		return secretKey;
 	}
 
 	/**
-	 *
-	 * @param secretKey
-	 * @return
+	 * @param secretKey the secret key
+	 * @return base64 encoded secret key
 	 */
 	public String getEncodedSecretKey(SecretKey secretKey) {
 		return base64.encodeToString(secretKey.getEncoded());
 	}
 
 	/**
-	 *
-	 * @param secretKey
-	 * @return
+	 * Decodes the secret key
+	 * @param secretKey the encoded secret key
+	 * @return the decoded secret key
 	 */
 	public SecretKey getDecodedSecretKey(String secretKey) {
 		return new SecretKeySpec(base64.decode(secretKey), "AES");
 	}
 
 	/**
-	 *
-	 * @param rawText
-	 * @param hashIterations
-	 * @param keyLength
-	 * @return
+	 * Encrypts a string
+	 * @param plainText the plain text as a String
+	 * @param hashIterations the number of iterations of the hash function
+	 * @param keyLength the length of the key
+	 * @return encrypted string
 	 * @throws NoSuchAlgorithmException
 	 * @throws InvalidKeySpecException
 	 * @throws InvalidKeyException
@@ -97,20 +94,20 @@ public class AESCipher {
 	 * @throws BadPaddingException
 	 * @throws InvalidAlgorithmParameterException
 	 */
-	public String encrypt(String rawText, int hashIterations, KeyLength keyLength)
+	public String encrypt(String plainText, int hashIterations, KeyLength keyLength)
 			throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException {
 
 		SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
 		SecureRandom secureRandom = new SecureRandom();
 
-		byte[] seed = secureRandom.generateSeed(initializationVectorSeedLength);
+		byte[] seed = secureRandom.generateSeed(IVSeedLength);
 		AlgorithmParameterSpec algorithmParameterSpec = new IvParameterSpec(seed);
 
 		KeySpec keySpec = new PBEKeySpec(getRandomPassword(), secureRandom.generateSeed(saltLength), hashIterations, keyLength.getBits());
 		secretKey = new SecretKeySpec(secretKeyFactory.generateSecret(keySpec).getEncoded(), "AES");
 
 		cipher.init(Cipher.ENCRYPT_MODE, secretKey, algorithmParameterSpec);
-		byte[] encryptedMessageBytes = cipher.doFinal(rawText.getBytes());
+		byte[] encryptedMessageBytes = cipher.doFinal(plainText.getBytes());
 
 		byte[] bytesToEncode = new byte[seed.length + encryptedMessageBytes.length];
 		System.arraycopy(seed, 0, bytesToEncode, 0, seed.length);
@@ -120,10 +117,10 @@ public class AESCipher {
 	}
 
 	/**
-	 *
-	 * @param encryptedText
-	 * @param secretKey
-	 * @return
+	 * Decrypts ciphertext
+	 * @param encryptedText Encrypted text as a String
+	 * @param secretKey The secret key needed to decrypt the cipher text
+	 * @return decrypted text
 	 * @throws InvalidKeyException
 	 * @throws IllegalBlockSizeException
 	 * @throws BadPaddingException
@@ -134,14 +131,15 @@ public class AESCipher {
 
 		byte[] bytesToDecode = base64.decode(encryptedText);
 
-		byte[] emptySeed = new byte[initializationVectorSeedLength];
-		System.arraycopy(bytesToDecode, 0, emptySeed, 0, initializationVectorSeedLength);
+		byte[] emptySeed = new byte[IVSeedLength];
+		System.arraycopy(bytesToDecode, 0, emptySeed, 0, IVSeedLength);
 
 		cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(emptySeed));
 
-		int messageDecryptedBytesLength = bytesToDecode.length - initializationVectorSeedLength;
+		//get length of message by subtracting the IV length
+		int messageDecryptedBytesLength = bytesToDecode.length - IVSeedLength;
 		byte[] messageDecryptedBytes = new byte[messageDecryptedBytesLength];
-		System.arraycopy(bytesToDecode, initializationVectorSeedLength, messageDecryptedBytes, 0, messageDecryptedBytesLength);
+		System.arraycopy(bytesToDecode, IVSeedLength, messageDecryptedBytes, 0, messageDecryptedBytesLength);
 
 		return new String(cipher.doFinal(messageDecryptedBytes));
 	}
@@ -166,7 +164,7 @@ public class AESCipher {
 
 	/**
 	 *
-	 * @return
+	 * @return the random password
 	 */
 	protected char[] getRandomPassword() {
 

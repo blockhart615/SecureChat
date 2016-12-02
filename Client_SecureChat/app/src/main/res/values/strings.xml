@@ -7,4 +7,5 @@
     <string name="title_activity_chat">ChatActivity</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_test">TEST</string>
+    <string name="title_activity_tester">TESTER</string>
 </resources>

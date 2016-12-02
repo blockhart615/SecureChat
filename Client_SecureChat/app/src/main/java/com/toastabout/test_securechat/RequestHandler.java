@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import Encryption.*;
 
 public class RequestHandler {
     // Server user login url
@@ -30,7 +29,6 @@ public class RequestHandler {
     private final String REGISTER_URL = "https://toastabout.com/SecureChat/register.php";
     private final String GET_MESSAGES_URL = "https://toastabout.com/SecureChat/GetMessage.php";
     private final String POST_MESSAGE_URL = "https://toastabout.com/SecureChat/SendMessage.php";
-    private final String ALGORITHM = "RSA";
 
     private JSONObject loginResponse, registerResponse, getMessageResponse, postMessageResponse;
 
