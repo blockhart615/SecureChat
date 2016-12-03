@@ -34,9 +34,10 @@ public class RequestHandler {
 
     private JSONObject loginResponse, registerResponse, getMessageResponse, postMessageResponse;
 
-    //SpongyCastle security provider.
-    static {
-        Security.insertProviderAt(new org.spongycastle.jce.provider.BouncyCastleProvider(), 1);
+    private AESCipher aesCipher;
+
+    public RequestHandler() {
+        aesCipher = new AESCipher();
     }
 
 
@@ -247,7 +248,7 @@ public class RequestHandler {
                     @Override
                     public void onResponse(String response) {
 
-                        String sender, message, timeStamp;
+                        String sender, message, encryptedMessage, timeStamp;
                         JSONObject messageObject;
                         ArrayList<String> chatMessages = new ArrayList<>();
 
@@ -264,14 +265,22 @@ public class RequestHandler {
 
                                 //get data from JSON message
                                 sender = messageObject.getString("sender");
-                                message = messageObject.getString("message");
+                                encryptedMessage = messageObject.getString("message");
                                 timeStamp = messageObject.getString("time_sent");
-                                String messageString = sender + ":\n" + message + "\n" + timeStamp;
 
-                                //add message to arraylist if it isn't already in the list
-                                if (!chatMessages.contains(messageString)){
-                                    chatMessages.add(messageString);
+                                try {
+                                    message = aesCipher.decrypt(encryptedMessage);
+                                    String messageString = sender + ":\n" + message + "\n" + timeStamp;
+                                    //add message to arraylist if it isn't already in the list
+                                    if (!chatMessages.contains(messageString)){
+                                        chatMessages.add(messageString);
+                                    }
                                 }
+                                catch (Exception e){
+                                    Log.d("Decryption error: ", e.getMessage());
+                                }
+
+
                             }
 
                             //make array adapter for listView of messages and set adapter to list view
@@ -354,7 +363,15 @@ public class RequestHandler {
             protected HashMap<String, String> getParams()
             {
                 HashMap<String, String> params = new HashMap<>();
-                params.put("message-to-send", message);
+                //encrypt message before sending to server
+                try {
+                    String encryptedMessage = aesCipher.encrypt(message);
+                    params.put("message-to-send", encryptedMessage);
+                }
+                catch (Exception e) {
+                    Log.d("Encryption Error: ", e.getMessage());
+                }
+
                 params.put("recipient", receiver);
                 return params;
             }

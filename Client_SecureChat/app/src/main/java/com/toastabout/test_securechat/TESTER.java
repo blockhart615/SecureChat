@@ -10,6 +10,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import org.spongycastle.util.encoders.Base64;
+
 import Encryption.*;
 
 import java.io.UnsupportedEncodingException;
@@ -17,6 +19,7 @@ import java.io.UnsupportedEncodingException;
 public class TESTER extends AppCompatActivity {
 
 	RSACipher rsaCipher;
+	AESCipher aesCipher;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -29,16 +32,15 @@ public class TESTER extends AppCompatActivity {
 		final TextView tv2 = (TextView) findViewById(R.id.tv2);
 		final TextView tv3 = (TextView) findViewById(R.id.tv3);
 		final Button button = (Button) findViewById(R.id.button);
-		rsaCipher = new RSACipher();
+		try {
+			rsaCipher = new RSACipher();
+		}
+		catch (Exception e) {
+			Log.d("rsaCipher: ", e.getMessage());
+		}
+		aesCipher = new AESCipher();
 
-		FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-		fab.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-						.setAction("Action", null).show();
-			}
-		});
+
 
 		button.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -48,20 +50,39 @@ public class TESTER extends AppCompatActivity {
 				//set plaintext
 				tv1.setText(testString);
 
-				//set ciphertext
-				byte[] cipherText = rsaCipher.RSAEncrypt(testString);
-				try {
-					String cipherString = new String(cipherText, "UTF8");
-					tv2.setText(cipherString);
+				//TEST AES ENCRYPTION
+//				try {
+//					//set cipher text
+//					String cipherText = aesCipher.encrypt(testString);
+//
+//					tv2.setText(cipherText);
+//
+//					//set decrypted plaintext
+//					String plainText = aesCipher.decrypt(cipherText);
+//					tv3.setText(plainText);
+//				}
+//				catch (Exception e) {
+//					e.printStackTrace();
+//					Log.d("Exception: ", e.getMessage());
+//				}
 
-					//set decrypted plaintext
-					byte[] plainByte = rsaCipher.RSADecrypt(cipherString);
-					String plainText = new String(plainByte, "UTF8");
+				//TEST RSA ENCRYPTION
+				try {
+					//encrypt sample text
+					String cipherText = rsaCipher.encrypt(testString);
+					tv2.setText(cipherText);
+
+					//decrypt sample text
+					String plainText = rsaCipher.decrypt(cipherText);
 					tv3.setText(plainText);
+
 				}
-				catch (UnsupportedEncodingException e) {
-					Log.w("UnsupportedEncoding", e.getMessage());
+				catch (Exception e) {
+					e.printStackTrace();
+					Log.d("Exception: ", e.getMessage());
 				}
+
+
 			}
 		});
 
