@@ -53,12 +53,14 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
         $response ["jwt"] = $jwt;
         echo json_encode($response);
 
-    } else { //Username or Password were incorrect
+    } 
+    else { //Username or Password were incorrect
         $response["error"] = true;
         $response["error_msg"] = "Username or password are incorrect. Please try again!";
         echo json_encode($response);
     }
-} else { //A parameter is missing
+} 
+else { //A parameter is missing
     $response["error"] = true;
     $response["error_msg"] = "Required parameters username or password is missing!";
     echo json_encode($response);

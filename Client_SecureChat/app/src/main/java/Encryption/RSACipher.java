@@ -89,7 +89,7 @@ public class RSACipher {
 	 * @param plainText
 	 * @return
 	 */
-	public String encrypt(String plainText, String friend) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException{
+	public String encrypt(String plainText) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException{
 
 		// Get friend's public key from key chain
 		// cipher.init(Cipher.ENCRYPT_MODE, keyChain.get(friend));

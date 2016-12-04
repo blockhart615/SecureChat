@@ -39,9 +39,6 @@ public class InboxActivity extends AppCompatActivity {
 		}
 
 
-
-
-
 		//FAB to create new conversation with a user
 		FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 		fab.setOnClickListener(new View.OnClickListener() {

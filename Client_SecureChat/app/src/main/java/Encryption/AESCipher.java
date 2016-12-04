@@ -1,9 +1,5 @@
 package Encryption;
 
-/**
- * Created by Brett on 12/1/2016.
- */
-
 import android.util.Log;
 
 import java.security.Key;
@@ -32,9 +28,10 @@ public class AESCipher {
 	private final int HASH_SIZE = 32; //256 bits = 32 bytes
 	private final int IV_LENGTH = 16; //128 bit IV
 
-	KeyGenerator keyGen;
+	private KeyGenerator keyGen;
 	private SecretKey encryptionKey, integrityKey;
 	private Cipher cipher;
+	private RSACipher rsaCipher;
 
 	/**
 	 * DEFAULT CONSTRUCTOR
@@ -46,6 +43,7 @@ public class AESCipher {
 			keyGen = KeyGenerator.getInstance(ALGORITHM);
 			keyGen.init(KEY_SIZE);
 			integrityKey = keyGen.generateKey();
+			rsaCipher = new RSACipher();
 		}
 		catch (NoSuchAlgorithmException e) {
 			Log.w("No Such Algorithm: ", e.getMessage());
@@ -83,38 +81,46 @@ public class AESCipher {
 	public String encrypt(String plainText)
 			throws Exception{
 
-		//Generate new key for every message
+		//Generate new key and IV for every message
 		encryptionKey = keyGen.generateKey();
 		IvParameterSpec iv = generateIV();
 
+		//encrypt the plainText
 		cipher.init(Cipher.ENCRYPT_MODE, encryptionKey, iv);
+
+		/**
+		 * IV + ENCRYPTED + HMACtag + enc(KEY_E + KEY_I)
+		 */
+		byte[]ivBytes = iv.getIV();
 		byte[] encrypted = cipher.doFinal(plainText.getBytes());
+		byte[] tag = performHMAC(encrypted, integrityKey);
+		byte[] key_e = encryptionKey.getEncoded();
+		byte[] key_i = integrityKey.getEncoded();
+		int startPos = 0;
+		byte[] cipherText = new byte[IV_LENGTH + encrypted.length + HASH_SIZE + key_e.length + key_i.length];
 
-		byte[] cipherText = new byte[IV_LENGTH + encrypted.length];
+		System.out.println("KEY_e: " + Base64.toBase64String(key_e));
+		System.out.println("KEY_i: " + Base64.toBase64String(key_i));
 
-		//append IV to the front of the ciphertext
-		System.arraycopy(iv.getIV(), 0, cipherText, 0, iv.getIV().length);
-		System.arraycopy(encrypted, 0, cipherText, IV_LENGTH, encrypted.length);
+		//build out cipherText byte array to be sent
+		// add IV
+		System.arraycopy(ivBytes, 0, cipherText, startPos, ivBytes.length);
+		startPos += ivBytes.length;
 
-		//add HMAC tag to end of cipherText
-		byte[] hash = performHMAC(encrypted);
+		// add encrypted message
+		System.arraycopy(encrypted, 0, cipherText, startPos, encrypted.length);
+		startPos += encrypted.length;
 
-		//cipherHash is a byte array that is the cipherText || hash
-		byte[] cipherHash = new byte[hash.length + cipherText.length];
-		System.arraycopy(cipherText, 0, cipherHash, 0, cipherText.length);
-		System.arraycopy(hash, 0, cipherHash, cipherText.length, hash.length);
+		// add HMAC tag
+		System.arraycopy(tag, 0, cipherText, startPos, tag.length);
+		startPos += tag.length;
 
-		// concatenate the encryption key to the end of the ciphertext
-		byte[] keyBytes = encryptionKey.getEncoded();
+		//add encryption key and integrity key
+		System.arraycopy(key_e, 0, cipherText, startPos, key_e.length);
+		startPos += key_e.length;
+		System.arraycopy(key_i, 0, cipherText, startPos, key_i.length);
 
-		// byte array of everything combined
-		// IV || Cipher Text || HMAC || Key
-		byte[] combined = new byte[cipherHash.length + keyBytes.length];
-
-		System.arraycopy(cipherHash, 0, combined, 0, cipherHash.length);
-		System.arraycopy(keyBytes, 0, combined, cipherHash.length, keyBytes.length);
-
-		return Base64.toBase64String(combined);
+		return Base64.toBase64String(cipherText);
 	}
 
 	/**
@@ -129,45 +135,59 @@ public class AESCipher {
 	public String decrypt(String cipherText)
 			throws Exception{
 
-		//store ciphertext
-		byte[] decodedBytes = Base64.decode(cipherText);
-		//start new byte array to hold encryption key
-		byte[] decryptionBytes = new byte[KEY_SIZE/8];
-		//get length of IV + Message. Have to divide by 8 to convert from bits to bytes
-		int IVandMessage = decodedBytes.length - KEY_SIZE/8;
-
-		//get decryption key out of ciphertext
-		System.arraycopy(decodedBytes, IVandMessage, decryptionBytes, 0, decryptionBytes.length);
-		Key decryptionKey = new SecretKeySpec(decryptionBytes, ALGORITHM);
-
-		//get IV out of ciphertext
+		/**
+		 * HAVE TO GET EACH THING OUT OF CIPHERTEXT
+		 * IV + cipherText + HMAC + Key_e + Key_i
+		 */
+		byte[] decodedBytes = Base64.decode(cipherText); //the WHOLE package
 		byte[] iv = new byte[IV_LENGTH];
-		System.arraycopy(decodedBytes, 0, iv, 0, IV_LENGTH);
-
-		//get length of message. have to remove IV length and key bytes
-		int messageLength = decodedBytes.length - IV_LENGTH - decryptionBytes.length - HASH_SIZE;
-		byte[] messageBytes = new byte[messageLength];
-		System.arraycopy(decodedBytes, IV_LENGTH, messageBytes, 0, messageLength);
-
-		//get HASH tag out of ciphertext
+		byte[] encryptedMessage = new byte[decodedBytes.length - IV_LENGTH - HASH_SIZE - (2*KEY_SIZE/8)];
 		byte[] hash = new byte[HASH_SIZE];
-		System.arraycopy(decodedBytes, IV_LENGTH + messageBytes.length, hash, 0, HASH_SIZE);
+		byte[] encryptionKeyBytes = new byte[KEY_SIZE/8];
+		byte[] integrityKeyBytes = new byte[KEY_SIZE/8];
+		int startingPos = 0;
+
+		//get IV out of decoded bytes
+		System.arraycopy(decodedBytes, startingPos, iv, 0, IV_LENGTH);
+		startingPos += IV_LENGTH;
+
+		//get encrypted message out of decoded bytes
+		System.arraycopy(decodedBytes, startingPos, encryptedMessage, 0, encryptedMessage.length);
+		startingPos += encryptedMessage.length;
+
+		//get HMAC tag out of decoded bytes
+		System.arraycopy(decodedBytes, startingPos, hash, 0, hash.length);
+		startingPos += hash.length;
+
+		//get key_e out of decoded bytes
+		System.arraycopy(decodedBytes, startingPos, encryptionKeyBytes, 0, encryptionKeyBytes.length);
+		startingPos += encryptionKeyBytes.length;
+
+		//get key_i out of decoded bytes
+		System.arraycopy(decodedBytes, startingPos, integrityKeyBytes, 0, integrityKeyBytes.length);
+		//System.arraycopy(decodedBytes, decodedBytes.length - encryptedKeys.length, encryptedKeys, 0, encryptedKeys.length);
+
+		//create keys out of byte arrays that were extracted
+		Key key_e = new SecretKeySpec(encryptionKeyBytes, ALGORITHM);
+		Key key_i = new SecretKeySpec(integrityKeyBytes, ALGORITHM);
+
+		System.out.println("KEY_e: " + Base64.toBase64String(key_e.getEncoded()));
+		System.out.println("KEY_i: " + Base64.toBase64String(key_i.getEncoded()));
 
 		//Checks if the tag matches
-		if (Arrays.equals(hash, performHMAC(messageBytes))){
+		if (Arrays.equals(hash, performHMAC(encryptedMessage, key_i))){
 			//Decrypt the cipher text
-			cipher.init(Cipher.DECRYPT_MODE, decryptionKey, new IvParameterSpec(iv));
-			byte[] plainText = cipher.doFinal(messageBytes);
+			cipher.init(Cipher.DECRYPT_MODE, key_e, new IvParameterSpec(iv));
+			byte[] plainText = cipher.doFinal(encryptedMessage);
 
 			return new String(plainText);
 		}
 		else {
 			System.out.println("HMAC DID NOT MATCH!");
 			System.out.println("Original HMAC: " + Base64.toBase64String(hash));
-			System.out.println("Calculated HMAC: " + Base64.toBase64String(performHMAC(messageBytes)));
+			System.out.println("Calculated HMAC: " + Base64.toBase64String(performHMAC(encryptedMessage, key_i)));
 			return null;
 		}
-
 
 	}
 
@@ -191,11 +211,11 @@ public class AESCipher {
 	 * @throws NoSuchAlgorithmException
 	 * @throws InvalidKeyException
      */
-	private byte[] performHMAC(byte[] cipherText) throws NoSuchAlgorithmException, InvalidKeyException{
+	private byte[] performHMAC(byte[] cipherText, Key key_i) throws NoSuchAlgorithmException, InvalidKeyException{
 
 		//create new mac and hash the cipherText
 		Mac hmac = Mac.getInstance(HMAC_ALGORITHM);
-		hmac.init(integrityKey);
+		hmac.init(key_i);
 
 		return hmac.doFinal(cipherText);
 	}

@@ -34,18 +34,26 @@ public class RegisterActivity extends AppCompatActivity {
 				EditText confirmPassword = (EditText) findViewById(R.id.confirm_password);
 				EditText email = (EditText) findViewById(R.id.email);
 
+				String user = username.getText().toString();
+				String passwordText = password.getText().toString();
+				String confirmPassText = confirmPassword.getText().toString();
+				String emailText = email.getText().toString();
+
 				//if valid email, username isn't already taken, password and confirmation match
-				if (username.getText().toString().isEmpty())
+				if (user.isEmpty())
 					Toast.makeText(RegisterActivity.this, "Username field is empty", Toast.LENGTH_SHORT).show();
-				else if (password.getText().toString().isEmpty())
+				//if either password field is empty, error
+				else if (passwordText.isEmpty() || confirmPassText.isEmpty())
 					Toast.makeText(RegisterActivity.this, "Password field is empty", Toast.LENGTH_SHORT).show();
-				else if (email.getText().toString().isEmpty())
+				//if email field is empty
+				else if (emailText.isEmpty())
 					Toast.makeText(RegisterActivity.this, "Email field is empty", Toast.LENGTH_SHORT).show();
-				else if (password.getText().equals(confirmPassword.getText()))
+				//if passwords don't match
+				else if (!passwordText.equals(confirmPassText))
 					Toast.makeText(RegisterActivity.this, "Passwords did not match.", Toast.LENGTH_SHORT).show();
 				//if all is good, send request to server
 				else
-					requester.registerUser(username.getText().toString(), password.getText().toString(), email.getText().toString(), RegisterActivity.this);
+					requester.registerUser(user, passwordText, emailText, RegisterActivity.this);
 			}
 		});
 

@@ -41,7 +41,6 @@ public class TESTER extends AppCompatActivity {
 		aesCipher = new AESCipher();
 
 
-
 		button.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
@@ -50,7 +49,7 @@ public class TESTER extends AppCompatActivity {
 				//set plaintext
 				tv1.setText(testString);
 
-				//TEST AES ENCRYPTION
+//				//TEST AES ENCRYPTION
 //				try {
 //					//set cipher text
 //					String cipherText = aesCipher.encrypt(testString);

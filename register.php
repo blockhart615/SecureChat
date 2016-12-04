@@ -38,10 +38,9 @@ if (isset($_POST['username']) && isset($_POST['email']) && isset($_POST['passwor
             $response["username"] = $user['username'];
             $response["email"] = $user['email'];
             echo json_encode($response);
-        }//IF USER CREATION SUCCESSFUL
-
- 	  		//something unknown went wrong
-		  else {
+        }
+ 	  	//something unknown went wrong
+		else {
 				$response["error"] = true;
                 $response['error_msg'] = "Unknown error occurred during registration.";
                 echo json_encode($response);
