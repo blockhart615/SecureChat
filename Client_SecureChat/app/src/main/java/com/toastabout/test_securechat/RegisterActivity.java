@@ -10,7 +10,7 @@ import android.widget.Toast;
 
 public class RegisterActivity extends AppCompatActivity {
 
-	private RequestHandler requester = new RequestHandler();
+	private RequestHandler requester;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +22,8 @@ public class RegisterActivity extends AppCompatActivity {
 		if (getSupportActionBar() != null) {
 			getSupportActionBar().setTitle("Create New User");
 		}
+
+		requester = new RequestHandler(this);
 
 		//Click Listener for Register Button
 		Button registerBtn = (Button) findViewById(R.id.register_btn);

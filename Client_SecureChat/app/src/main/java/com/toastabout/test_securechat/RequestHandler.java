@@ -31,11 +31,12 @@ public class RequestHandler {
     private final String POST_MESSAGE_URL = "https://toastabout.com/SecureChat/SendMessage.php";
 
     private JSONObject loginResponse, registerResponse, getMessageResponse, postMessageResponse;
-
+    private Context context;
     private AESCipher aesCipher;
 
-    public RequestHandler() {
-        aesCipher = new AESCipher();
+    public RequestHandler(Context context) {
+        this.context = context;
+        aesCipher = new AESCipher(context);
     }
 
 
@@ -363,7 +364,7 @@ public class RequestHandler {
                 HashMap<String, String> params = new HashMap<>();
                 //encrypt message before sending to server
                 try {
-                    String encryptedMessage = aesCipher.encrypt(message);
+                    String encryptedMessage = aesCipher.encrypt(message, receiver);
                     params.put("message-to-send", encryptedMessage);
                 }
                 catch (Exception e) {

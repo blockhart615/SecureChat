@@ -12,7 +12,7 @@ import android.widget.Toast;
 
 public class ChatActivity extends AppCompatActivity {
 
-    RequestHandler requester = new RequestHandler();
+    RequestHandler requester;
     String username, friend, jwt;
     ListView listView;
 
@@ -23,7 +23,7 @@ public class ChatActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
+        requester = new RequestHandler(ChatActivity.this);
         listView = (ListView) findViewById(R.id.list_view);
 
         Bundle extras = getIntent().getExtras();

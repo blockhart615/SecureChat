@@ -1,25 +1,39 @@
 package com.toastabout.test_securechat;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.io.IOException;
+import java.security.PublicKey;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.spongycastle.util.encoders.Base64;
 
 import Encryption.*;
 
-import java.io.UnsupportedEncodingException;
-
 public class TESTER extends AppCompatActivity {
 
-	RSACipher rsaCipher;
-	AESCipher aesCipher;
+	private RSACipher rsaCipher;
+	private AESCipher aesCipher;
+	private Map<String, PublicKey> keys;
+	ObjectMapper mapper;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -28,71 +42,100 @@ public class TESTER extends AppCompatActivity {
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
 
-		final TextView tv1 = (TextView) findViewById(R.id.tv1);
-		final TextView tv2 = (TextView) findViewById(R.id.tv2);
-		final TextView tv3 = (TextView) findViewById(R.id.tv3);
-		final Button button = (Button) findViewById(R.id.button);
+		DisplayMetrics displaymetrics = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+		int WIDTH = displaymetrics.widthPixels;
+
+
 		try {
-			rsaCipher = new RSACipher();
-		}
-		catch (Exception e) {
+			rsaCipher = new RSACipher(this);
+		} catch (Exception e) {
 			Log.d("rsaCipher: ", e.getMessage());
 		}
-		aesCipher = new AESCipher();
+		aesCipher = new AESCipher(this);
 
+		String testString = "Hello World!";
+		System.out.println("ORIGINAL STRING: " + testString + "\n\n");
 
-		button.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				String testString = "Hello World!";
-
-				//set plaintext
-				tv1.setText(testString);
-
-//				//TEST AES ENCRYPTION
-//				try {
-//					//set cipher text
-//					String cipherText = aesCipher.encrypt(testString);
+		//TEST AES ENCRYPTION
+//		try {
+//			//set cipher text
+//			String cipherText = aesCipher.encrypt(testString);
+//			System.out.println("CIPHER TEXT: " + cipherText);
 //
-//					tv2.setText(cipherText);
+//			//set decrypted plaintext
+//			String plainText = aesCipher.decrypt(cipherText);
+//			System.out.println("PLAIN TEXT: " + plainText);
+//		}
+//		catch (Exception e) {
+//			e.printStackTrace();
+//			Log.d("Exception: ", e.getMessage());
+//		}
+
+//		//TEST RSA ENCRYPTION
+		try {
 //
-//					//set decrypted plaintext
-//					String plainText = aesCipher.decrypt(cipherText);
-//					tv3.setText(plainText);
-//				}
-//				catch (Exception e) {
-//					e.printStackTrace();
-//					Log.d("Exception: ", e.getMessage());
-//				}
+//			rsaCipher.addKeyToKeychain("Bob", rsaCipher.getPublicKey());
+//			rsaCipher.addKeyToKeychain("Alice", rsaCipher.getPublicKey());
+//			rsaCipher.addKeyToKeychain("Gary", rsaCipher.getPublicKey());
+//			rsaCipher.addKeyToKeychain("Brett", rsaCipher.getPublicKey());
+//			rsaCipher.addKeyToKeychain("Sam", rsaCipher.getPublicKey());
+			keys = rsaCipher.getKeyChain();
 
-				//TEST RSA ENCRYPTION
-				try {
-					//encrypt sample text
-					String cipherText = rsaCipher.encrypt(testString);
-					tv2.setText(cipherText);
-
-					//decrypt sample text
-					String plainText = rsaCipher.decrypt(cipherText);
-					tv3.setText(plainText);
-
-				}
-				catch (Exception e) {
-					e.printStackTrace();
-					Log.d("Exception: ", e.getMessage());
-				}
-
-
+			//display friends and their public keys from a file
+			for (Map.Entry<String, PublicKey> entry : keys.entrySet()) {
+				System.out.println("Friend: " + entry.getKey());
+				System.out.println(entry.getKey() + "'s Public Key: " + Base64.toBase64String(entry.getValue().getEncoded()));
 			}
-		});
 
+			//encrypt sample text
+			byte[] cipherBytes = rsaCipher.encrypt(testString.getBytes(), rsaCipher.getPublicKey());
+			String cipherText = Base64.toBase64String(cipherBytes);
+			System.out.println("CIPHER TEXT: " + cipherText + "\n\n");
 
+			//decrypt sample text
+			byte[] plainTextBytes = rsaCipher.decrypt(Base64.decode(cipherText));
+			String plainText = new String(plainTextBytes);
+			System.out.println("DECRYPTED TEXT : " + plainText + "\n\n");
 
+		} catch (Exception e) {
+			e.printStackTrace();
+			Log.d("Exception: ", e.getMessage());
+		}
+	}
 
+	/**
+	 * Get result from scanning barcode
+	 * @param requestCode
+	 * @param resultCode
+	 * @param intent
+     */
+	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		TextView scanText = (TextView) findViewById(R.id.scanResults);
+		IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+		if (scanResult != null) {
 
+			//display scan result text
+			scanText.setText(scanResult.getContents());
+			System.out.println(scanResult.getContents());
+			//recreate Map from JSON String
 
-
-
+			try {
+				Map<String,String> friend = mapper.readValue(scanResult.getContents(), new TypeReference<HashMap<String, String>>() {
+				});
+				for (Map.Entry<String, String> entry : friend.entrySet()) {
+					System.out.println("Friend: " + entry.getKey());
+					System.out.println(entry.getKey() + "'s Public Key: " + entry.getValue());
+				}
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+				Log.d("IOException: ", e.getMessage());
+			}
+		}
+		// else continue with any other code you need in the method
 
 	}
+
 
 }
