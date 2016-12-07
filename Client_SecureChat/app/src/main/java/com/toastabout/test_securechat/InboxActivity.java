@@ -12,7 +12,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Toast;
+
+import org.spongycastle.util.encoders.Base64;
 
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -20,13 +25,16 @@ import java.security.PublicKey;
 import java.security.Security;
 import java.util.ArrayList;
 
+import Encryption.RSACipher;
+
 public class InboxActivity extends AppCompatActivity {
 
-	private RequestHandler requester = new RequestHandler();
+	private RequestHandler requester;
 	private String jwt, username, friend;
 	private ListView lv;
 	private ArrayList<String> conversations;
-	private Intent intent = new Intent("com.toastabout.test_securechat.ChatActivity");
+	private Intent ChatIntent;
+	private Intent ExchangeIntent;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -38,9 +46,9 @@ public class InboxActivity extends AppCompatActivity {
 			getSupportActionBar().setTitle("Inbox");
 		}
 
-
-
-
+		requester = new RequestHandler(this);
+		ChatIntent = new Intent("com.toastabout.test_securechat.ChatActivity");
+		ExchangeIntent = new Intent("com.toastabout.test_securechat.KeyExchange");
 
 		//FAB to create new conversation with a user
 		FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -48,19 +56,34 @@ public class InboxActivity extends AppCompatActivity {
 			@Override
 			public void onClick(View view) {
 
-				AlertDialog.Builder builder = new AlertDialog.Builder(InboxActivity.this);
+				final AlertDialog.Builder builder = new AlertDialog.Builder(InboxActivity.this);
 				builder.setTitle("Start new Conversation with: ");
 
 				final EditText newChatInput = new EditText(InboxActivity.this);
 				builder.setView(newChatInput);
+
+				//button to start a new conversation
 				builder.setPositiveButton("Go", new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						friend = newChatInput.getText().toString();
-						intent.putExtra("username", username);
-						intent.putExtra("friend", friend);
-						intent.putExtra("jwt", jwt);
-						startActivity(intent);
+						if (!newChatInput.getText().toString().equals("")) {
+							friend = newChatInput.getText().toString();
+							ChatIntent.putExtra("username", username);
+							ChatIntent.putExtra("friend", friend);
+							ChatIntent.putExtra("jwt", jwt);
+							startActivity(ChatIntent);
+						}
+						else {
+							Toast.makeText(InboxActivity.this, "You need to enter a username.", Toast.LENGTH_SHORT).show();
+						}
+					}
+				});
+				//button sends you to activity that exchanges keys
+				builder.setNegativeButton("Exchange Keys", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						ExchangeIntent.putExtra("username", username);
+						startActivity(ExchangeIntent);
 					}
 				});
 
@@ -104,10 +127,10 @@ public class InboxActivity extends AppCompatActivity {
 					friend = (String) lv.getItemAtPosition(i);
 
 					//fill intent Extras, and start new activity
-					intent.putExtra("username", username);
-					intent.putExtra("friend", friend);
-					intent.putExtra("jwt", jwt);
-					startActivity(intent);
+					ChatIntent.putExtra("username", username);
+					ChatIntent.putExtra("friend", friend);
+					ChatIntent.putExtra("jwt", jwt);
+					startActivity(ChatIntent);
 				}
 			});
 		}

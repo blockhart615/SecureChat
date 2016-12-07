@@ -16,26 +16,12 @@ import com.android.volley.toolbox.StringRequest;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.spongycastle.util.encoders.Base64;
 
-import java.io.UnsupportedEncodingException;
-import java.security.InvalidKeyException;
-import java.security.KeyFactory;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.security.Security;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-
+import Encryption.*;
 
 public class RequestHandler {
     // Server user login url
@@ -43,13 +29,14 @@ public class RequestHandler {
     private final String REGISTER_URL = "https://toastabout.com/SecureChat/register.php";
     private final String GET_MESSAGES_URL = "https://toastabout.com/SecureChat/GetMessage.php";
     private final String POST_MESSAGE_URL = "https://toastabout.com/SecureChat/SendMessage.php";
-    private final String ALGORITHM = "RSA";
 
     private JSONObject loginResponse, registerResponse, getMessageResponse, postMessageResponse;
+    private Context context;
+    private AESCipher aesCipher;
 
-    //SpongyCastle security provider.
-    static {
-        Security.insertProviderAt(new org.spongycastle.jce.provider.BouncyCastleProvider(), 1);
+    public RequestHandler(Context context) {
+        this.context = context;
+        aesCipher = new AESCipher(context);
     }
 
 
@@ -260,7 +247,7 @@ public class RequestHandler {
                     @Override
                     public void onResponse(String response) {
 
-                        String sender, message, timeStamp;
+                        String sender, message, encryptedMessage, timeStamp;
                         JSONObject messageObject;
                         ArrayList<String> chatMessages = new ArrayList<>();
 
@@ -277,14 +264,22 @@ public class RequestHandler {
 
                                 //get data from JSON message
                                 sender = messageObject.getString("sender");
-                                message = messageObject.getString("message");
+                                encryptedMessage = messageObject.getString("message");
                                 timeStamp = messageObject.getString("time_sent");
-                                String messageString = sender + ":\n" + message + "\n" + timeStamp;
 
-                                //add message to arraylist if it isn't already in the list
-                                if (!chatMessages.contains(messageString)){
-                                    chatMessages.add(messageString);
+                                try {
+                                    message = aesCipher.decrypt(encryptedMessage);
+                                    String messageString = sender + ":\n" + message + "\n" + timeStamp;
+                                    //add message to arraylist if it isn't already in the list
+                                    if (!chatMessages.contains(messageString)){
+                                        chatMessages.add(messageString);
+                                    }
                                 }
+                                catch (Exception e){
+                                    Log.d("Decryption error: ", e.getMessage());
+                                }
+
+
                             }
 
                             //make array adapter for listView of messages and set adapter to list view
@@ -367,7 +362,15 @@ public class RequestHandler {
             protected HashMap<String, String> getParams()
             {
                 HashMap<String, String> params = new HashMap<>();
-                params.put("message-to-send", message);
+                //encrypt message before sending to server
+                try {
+                    String encryptedMessage = aesCipher.encrypt(message, receiver);
+                    params.put("message-to-send", encryptedMessage);
+                }
+                catch (Exception e) {
+                    Log.d("Encryption Error: ", e.getMessage());
+                }
+
                 params.put("recipient", receiver);
                 return params;
             }

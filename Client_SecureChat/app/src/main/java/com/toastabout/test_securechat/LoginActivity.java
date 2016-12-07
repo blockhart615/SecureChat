@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 public class LoginActivity extends AppCompatActivity {
 
-	RequestHandler requester = new RequestHandler();
+	RequestHandler requester;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +25,7 @@ public class LoginActivity extends AppCompatActivity {
 			getSupportActionBar().setTitle("Secure Chat");
 		}
 
+		requester = new RequestHandler(LoginActivity.this);
 
 		//Add listener to the login button
 		Button loginBtn = (Button) findViewById(R.id.login_btn);

@@ -6,4 +6,6 @@
     <string name="title_activity_inbox">InboxActivity</string>
     <string name="title_activity_chat">ChatActivity</string>
     <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_test">TEST</string>
+    <string name="title_activity_key_exchange">KeyExchange</string>
 </resources>
