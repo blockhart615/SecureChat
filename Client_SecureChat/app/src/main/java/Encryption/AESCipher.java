@@ -87,8 +87,8 @@ public class AESCipher {
 	 * @throws BadPaddingException
 	 * @throws InvalidAlgorithmParameterException
 	 */
-	public String encrypt(String plainText, String friend)
-			throws Exception{
+	public String encrypt(String plainText,
+						  String friend) throws Exception{
 
 		//Generate new keys and IV for every message
 		encryptionKey = keyGen.generateKey();
@@ -241,7 +241,8 @@ public class AESCipher {
 	 * @throws NoSuchAlgorithmException
 	 * @throws InvalidKeyException
      */
-	private byte[] performHMAC(byte[] cipherText, Key key_i) throws NoSuchAlgorithmException, InvalidKeyException{
+	private byte[] performHMAC(byte[] cipherText,
+							   Key key_i) throws NoSuchAlgorithmException, InvalidKeyException{
 
 		//create new mac and hash the cipherText
 		Mac hmac = Mac.getInstance(HMAC_ALGORITHM);
