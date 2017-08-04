@@ -1,4 +1,4 @@
-package com.toastabout.test_securechat;
+package com.toastabout.SecureChat;
 
 import android.content.Context;
 import android.content.Intent;
@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import Classes.Constants;
 import Encryption.*;
 
 public class RequestHandler {
@@ -46,62 +47,10 @@ public class RequestHandler {
      * @return GET parameters for request
      */
     private String getGetMessagesURL(String username) {
-        return GET_MESSAGES_URL+"/?receiver="+username;
+        return Constants.GET_MESSAGES_URL+"/?receiver="+username;
     }
 
     public JSONObject getGETresponse() {return getMessageResponse;}
-
-    /**
-     * Send request to server to log in
-     * @param username username of user who wishes to log in
-     * @param password the user's password
-     * @param context context of the current Activity, to allow changing intents.
-     */
-    public void login(final String username,
-                      final String password,
-                      final Context context) {
-
-        // Request a string response from the provided URL.
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, LOGIN_URL,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        // Display the resposne from the server
-                        try {
-                            loginResponse = new JSONObject(response);
-                            if (!loginResponse.getBoolean("error")) {
-                                //if login is successful, send user to Inbox
-                                String jwt = loginResponse.getString("jwt");
-                                Intent intent = new Intent("com.toastabout.test_securechat.InboxActivity");
-                                intent.putExtra("jwt", jwt);
-                                intent.putExtra("username", username);
-                                context.startActivity(intent);
-                            } else {
-                                Toast.makeText(context, loginResponse.getString("error_msg"), Toast.LENGTH_SHORT).show();
-                            }
-                        } catch (JSONException e) {
-                            Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-
-                    }//END ON_RESPONSE
-                },//END RESPONSE LISTENER
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(context, "That didn't work!", Toast.LENGTH_SHORT).show();
-                    }
-                }) {
-            @Override
-            protected HashMap<String, String> getParams() {
-                HashMap<String, String> params = new HashMap<>();
-                params.put("username", username);
-                params.put("password", password);
-                return params;
-            }
-        };
-
-        MySingleton.getInstance(context).addToRequestQueue(stringRequest);
-    }
 
 
     /**
@@ -117,7 +66,7 @@ public class RequestHandler {
                              final Context context) {
 
         // Request a string response from the provided URL.
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, REGISTER_URL,
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Constants.REGISTER_URL,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -128,7 +77,7 @@ public class RequestHandler {
                                 //IF response is successful, change intent to login activity
                                 if (!registerResponse.getBoolean("error")) {
                                     try {
-                                        Intent intent = new Intent("com.toastabout.test_securechat.LoginActivity");
+                                        Intent intent = new Intent("com.toastabout.SecureChat.LoginActivity");
                                         intent.putExtra("username", registerResponse.getString("username"));
                                         context.startActivity(intent);
                                     } catch (Exception e) {
@@ -326,7 +275,7 @@ public class RequestHandler {
                             final Context context) {
 
         // Request a string response from the provided URL.
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, POST_MESSAGE_URL,
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Constants.POST_MESSAGE_URL,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {

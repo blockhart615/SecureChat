@@ -1,4 +1,4 @@
-package com.toastabout.test_securechat;
+package com.toastabout.SecureChat;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
 		// Context of the app under test.
 		Context appContext = InstrumentationRegistry.getTargetContext();
 
-		assertEquals("com.toastabout.test_securechat", appContext.getPackageName());
+		assertEquals("com.toastabout.SecureChat", appContext.getPackageName());
 	}
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.toastabout.test_securechat">
+    package="com.toastabout.SecureChat">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -11,7 +11,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".LoginActivity"
+            android:name="com.toastabout.SecureChat.LoginActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -20,44 +20,44 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
-                <action android:name="com.toastabout.test_securechat.LoginActivity" />
+                <action android:name="com.toastabout.SecureChat.LoginActivity" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".RegisterActivity"
+            android:name="com.toastabout.SecureChat.RegisterActivity"
             android:label="@string/title_activity_register"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
-                <action android:name="com.toastabout.test_securechat.RegisterActivity" />
+                <action android:name="com.toastabout.SecureChat.RegisterActivity" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".InboxActivity"
+            android:name="com.toastabout.SecureChat.InboxActivity"
             android:label="@string/title_activity_inbox"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
-                <action android:name="com.toastabout.test_securechat.InboxActivity" />
+                <action android:name="com.toastabout.SecureChat.InboxActivity" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".ChatActivity"
+            android:name="com.toastabout.SecureChat.ChatActivity"
             android:label="@string/title_activity_chat"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
-                <action android:name="com.toastabout.test_securechat.ChatActivity" />
+                <action android:name="com.toastabout.SecureChat.ChatActivity" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".TESTER"
+            android:name="com.toastabout.SecureChat.TESTER"
             android:label="@string/title_activity_chat"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustResize">
@@ -70,11 +70,11 @@
             <!-- </intent-filter> -->
         </activity>
         <activity
-            android:name=".KeyExchange"
+            android:name="com.toastabout.SecureChat.KeyExchangeActivity"
             android:label="@string/title_activity_key_exchange"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
-                <action android:name="com.toastabout.test_securechat.KeyExchange" />
+                <action android:name="com.toastabout.SecureChat.KeyExchange" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>

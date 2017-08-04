@@ -1,4 +1,4 @@
-package com.toastabout.test_securechat;
+package com.toastabout.SecureChat;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;

@@ -1,4 +1,4 @@
-package com.toastabout.test_securechat;
+package com.toastabout.SecureChat;
 
 import org.junit.Test;
 

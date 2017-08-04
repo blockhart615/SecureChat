@@ -1,4 +1,4 @@
-package com.toastabout.test_securechat;
+package com.toastabout.SecureChat;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,20 +12,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import org.spongycastle.util.encoders.Base64;
-
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.security.Security;
 import java.util.ArrayList;
-
-import Encryption.RSACipher;
 
 public class InboxActivity extends AppCompatActivity {
 
@@ -47,8 +37,8 @@ public class InboxActivity extends AppCompatActivity {
 		}
 
 		requester = new RequestHandler(this);
-		ChatIntent = new Intent("com.toastabout.test_securechat.ChatActivity");
-		ExchangeIntent = new Intent("com.toastabout.test_securechat.KeyExchange");
+		ChatIntent = new Intent("com.toastabout.SecureChat.ChatActivity");
+		ExchangeIntent = new Intent("com.toastabout.SecureChat.KeyExchangeActivity");
 
 		//FAB to create new conversation with a user
 		FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);

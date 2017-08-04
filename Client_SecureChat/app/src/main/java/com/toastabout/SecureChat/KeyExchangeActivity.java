@@ -1,11 +1,7 @@
-package com.toastabout.test_securechat;
+package com.toastabout.SecureChat;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -22,17 +18,15 @@ import com.google.zxing.integration.android.IntentResult;
 import org.spongycastle.util.encoders.Base64;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.PublicKey;
-import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.HashMap;
 import java.util.Map;
 
 import Encryption.RSACipher;
 
-public class KeyExchange extends AppCompatActivity {
+public class KeyExchangeActivity extends AppCompatActivity {
 
     private RSACipher rsaCipher;
     private ObjectMapper mapper;
@@ -53,7 +47,7 @@ public class KeyExchange extends AppCompatActivity {
 
         //creat rsaCipher object that will get the public key from a file
         try {
-            rsaCipher = new RSACipher(KeyExchange.this);
+            rsaCipher = new RSACipher(KeyExchangeActivity.this);
         }
         catch (Exception e) {
             Log.d("RSACipher: ", e.getMessage());
@@ -64,7 +58,7 @@ public class KeyExchange extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                rsaCipher.receivePublicKey(KeyExchange.this);
+                rsaCipher.receivePublicKey(KeyExchangeActivity.this);
             }
         });
 
