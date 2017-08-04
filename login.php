@@ -17,18 +17,17 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
     // assign the post params to variables
     $username = $_POST['username'];
     $password = $_POST['password'];
-
     // get the user by username and password
     $user = $db->getUserByUsernameAndPassword($username, $password);
 
-	 // If the user is found
+	// If the user is found
     if ($user != NULL) {
         //build JSON Web Token
         $tokenID = base64_encode(mcrypt_create_iv(32));
         $issuedAt = time();
         $notBefore = $issuedAt + 2; //add 10 seconds
         $expireTime = $notBefore + 180; //3 minutes after not before
-        $serverName = 'https://www.toastabout.com';
+        $serverName = 'SecureChat';
 
         //create token as an array
         $data = [
@@ -42,7 +41,6 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
                 'email' => $user['email'],
             ]
         ];
-
         //encode into a JWT
         $jwt = JWT::encode(
             $data, //data being encoded into the token

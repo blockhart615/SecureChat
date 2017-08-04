@@ -29,7 +29,7 @@ class DBFunctions
         $hash               = $this->hashSSHA($password);
         $encrypted_password = $hash["encrypted"]; // encrypted password
         $salt               = $hash["salt"]; // salt
-
+        
         //prepare statements to protect against SQL injections.
         $stmt = $this->conn->prepare("INSERT INTO users(username, email, encrypted_password, salt, created_at) VALUES(?, ?, ?, ?, NOW())");
         $stmt->bind_param("ssss", $username, $email, $encrypted_password, $salt);
@@ -65,7 +65,6 @@ class DBFunctions
         if ($stmt->execute()) {
             $user = $stmt->get_result()->fetch_assoc();
             $stmt->close();
-
             // verifying user password
             $salt               = $user['salt'];
             $encrypted_password = $user['encrypted_password'];
@@ -169,8 +168,8 @@ class DBFunctions
      */
     public function getMessages($username) {
         //prepare statements to protect against SQL injections
-        $stmt = $this->conn->prepare("SELECT * FROM messages WHERE receiver = ? OR sender = ? ORDER BY time_sent");
-        $stmt->bind_param("ss", $username, $username);
+        $stmt = $this->conn->prepare("SELECT * FROM messages WHERE receiver = ? ORDER BY time_sent");
+        $stmt->bind_param("s", $username);
 
         //if statement executes successfully, assign data to user array.
         if ($stmt->execute()) {
@@ -218,6 +217,16 @@ class DBFunctions
                 $response["conversations"] = $conversations;
                 $response["error"] = false;
                 $response["error_msg"] = "No errors!";
+
+
+                echo "Deleting messages........\n";     
+                //delete messages after they have been received
+                $stmt = $this->conn->prepare("DELETE FROM messages WHERE receiver = ?");
+                $stmt->bind_param("s", $username);
+                if (!$stmt->execute()) {
+                    $response["error"] = true;
+                    $response["error_msg"] = "Unable to remove messages from database.";
+                }
 
             } //IF AT LEAST ONE ROW
             else {
