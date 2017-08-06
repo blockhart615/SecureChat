@@ -1,7 +1,6 @@
 package com.toastabout.SecureChat;
 
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -22,16 +21,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import Classes.Constants;
-import Encryption.*;
+import Crypto.*;
 
 public class RequestHandler {
-    // Server user login url
-    private final String LOGIN_URL = "https://toastabout.com/SecureChat/login.php";
-    private final String REGISTER_URL = "https://toastabout.com/SecureChat/register.php";
-    private final String GET_MESSAGES_URL = "https://toastabout.com/SecureChat/GetMessage.php";
-    private final String POST_MESSAGE_URL = "https://toastabout.com/SecureChat/SendMessage.php";
 
-    private JSONObject loginResponse, registerResponse, getMessageResponse, postMessageResponse;
+    private JSONObject getMessageResponse, postMessageResponse;
     private Context context;
     private AESCipher aesCipher;
 
@@ -39,7 +33,6 @@ public class RequestHandler {
         this.context = context;
         aesCipher = new AESCipher(context);
     }
-
 
     /**
      * Get the URL for the GET parameter
@@ -54,71 +47,10 @@ public class RequestHandler {
 
 
     /**
-     * Registers a user in the database
-     * @param username desired username of the user
-     * @param password desire password of the user
-     * @param email User's email address
-     * @param context the Context of the current activity
-     */
-    public void registerUser(final String username,
-                             final String password,
-                             final String email,
-                             final Context context) {
-
-        // Request a string response from the provided URL.
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, Constants.REGISTER_URL,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        // Display the response from the server
-
-                        try {
-                            registerResponse = new JSONObject(response);
-                                //IF response is successful, change intent to login activity
-                                if (!registerResponse.getBoolean("error")) {
-                                    try {
-                                        Intent intent = new Intent("com.toastabout.SecureChat.LoginActivity");
-                                        intent.putExtra("username", registerResponse.getString("username"));
-                                        context.startActivity(intent);
-                                    } catch (Exception e) {
-                                        Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
-                                    }
-                                } else {
-                                    Toast.makeText(context, registerResponse.getString("error_msg"), Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        catch (JSONException e) {
-                            Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    }//END ON_RESPPONSE
-                },//END RESPONSE LISTENER
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(context, "That didn't work!", Toast.LENGTH_SHORT).show();
-                    }
-                })
-        {
-            @Override
-            protected HashMap<String, String> getParams()
-            {
-                HashMap<String, String> params = new HashMap<>();
-                params.put("username", username);
-                params.put("password", password);
-                params.put("email", email);
-                return params;
-            }
-        };
-
-        MySingleton.getInstance(context).addToRequestQueue(stringRequest);
-    }//END registerUser
-
-
-    /**
      * Get the conversations from the server
      * @param username the user that is logged in
      * @param lv List View that is going to be updated
-     * @param conversations An ArrayList of conversations
+     * @param conversations An ArrayList of conversations. This is just a list of names.
      * @param context Context of the current activity
      */
     public void getConversations(String username,
@@ -141,7 +73,7 @@ public class RequestHandler {
                         try {
                             getMessageResponse = new JSONObject(response);
 
-                            //IF NO ERRORS, DO THIS!
+                            //IF NO ERRORS, Get conversations
                             if (!getMessageResponse.getBoolean("error")) {
                                 JSONObject JSONconvos = getMessageResponse.getJSONObject("conversations");
                                 Iterator<String> iter = JSONconvos.keys();

@@ -1,4 +1,4 @@
-package Encryption;
+package Crypto;
 
 import android.content.Context;
 import android.util.Log;
@@ -14,7 +14,6 @@ import java.security.SecureRandom;
 import java.security.Security;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.crypto.*;

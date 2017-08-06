@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.spongycastle.util.encoders.Base64;
 
-import Encryption.*;
+import Crypto.*;
 
 public class TESTER extends AppCompatActivity {
 

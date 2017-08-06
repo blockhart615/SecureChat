@@ -24,7 +24,7 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.HashMap;
 import java.util.Map;
 
-import Encryption.RSACipher;
+import Crypto.RSACipher;
 
 public class KeyExchangeActivity extends AppCompatActivity {
 

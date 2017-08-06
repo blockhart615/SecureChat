@@ -84,12 +84,15 @@ public class InboxActivity extends AppCompatActivity {
 		//ONLY CALL THIS IF RECEIVED JWT
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
+
 			//gets token and username from previous activity
 			jwt = extras.getString("jwt");
 			username = extras.getString("username");
 			lv = (ListView) findViewById(R.id.list);
 			conversations = new ArrayList<>();
 
+            //TODO  Load any conversations stored in local files
+            //TODO  then pull any new messages from the server
 			//Get messages when screen loads
 			requester.getConversations(username, lv, conversations, InboxActivity.this);
 

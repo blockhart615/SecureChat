@@ -8,9 +8,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import Classes.AccountManager;
+
 public class RegisterActivity extends AppCompatActivity {
 
-	private RequestHandler requester;
+	private AccountManager accountManager;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -23,7 +25,7 @@ public class RegisterActivity extends AppCompatActivity {
 			getSupportActionBar().setTitle("Create New User");
 		}
 
-		requester = new RequestHandler(this);
+		accountManager = new AccountManager();
 
 		//Click Listener for Register Button
 		Button registerBtn = (Button) findViewById(R.id.register_btn);
@@ -55,7 +57,7 @@ public class RegisterActivity extends AppCompatActivity {
 					Toast.makeText(RegisterActivity.this, "Passwords did not match.", Toast.LENGTH_SHORT).show();
 				//if all is good, send request to server
 				else
-					requester.registerUser(user, passwordText, emailText, RegisterActivity.this);
+					accountManager.registerUser(user, passwordText, emailText, RegisterActivity.this);
 			}
 		});
 

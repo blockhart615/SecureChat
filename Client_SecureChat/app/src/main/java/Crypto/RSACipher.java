@@ -4,7 +4,7 @@
  * use HMAC-SHA256 for message integrity, etc
  */
 
-package Encryption;
+package Crypto;
 
 import android.app.Activity;
 import android.content.Context;
@@ -13,7 +13,6 @@ import android.util.Log;
 import android.widget.ImageView;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;

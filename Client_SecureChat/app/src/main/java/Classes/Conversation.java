@@ -1,6 +1,23 @@
 package Classes;
 
+import android.content.Context;
+import android.util.Log;
+import android.widget.Toast;
+
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.toastabout.SecureChat.MySingleton;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.HashMap;
+
+import Crypto.AESCipher;
 
 /**
  * Implements Conversations
@@ -8,7 +25,9 @@ import java.util.ArrayList;
 public class Conversation {
 
     private ArrayList<Message> conversation;
-    private String recipient;
+    private String user, recipient;
+    private JSONObject registerResponse, getMessageResponse, postMessageResponse;
+    private AESCipher aesCipher;
 
     /**
      * Constructor
@@ -37,6 +56,78 @@ public class Conversation {
      */
     public void loadConversation(String recipient) {
 
+    }
+
+    /**
+     * POST request sends message to the server
+     * @param message message to be sent
+     * @param receiver recipient of the message
+     * @param jwt the token that was received when user logged in
+     * @param context the context of the current activity
+     */
+    public void sendMessage(final String message,
+                            final String receiver,
+                            final String jwt,
+                            final Context context) {
+
+        // Request a string response from the provided URL.
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Constants.POST_MESSAGE_URL,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // Display the resposne from the server
+                        try {
+                            postMessageResponse = new JSONObject(response);
+                            String responseMsg = postMessageResponse.getString("error_msg");
+
+                            //if no error
+                            if (!postMessageResponse.getBoolean("error")) {
+                                Toast.makeText(context, responseMsg, Toast.LENGTH_SHORT).show();
+                            }
+                            //some error occurred
+                            else {
+                                Toast.makeText(context, responseMsg, Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        catch (JSONException e) {
+                            Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+
+
+                    }//END ON_RESPPNSE
+                },//END RESPONSE LISTENER
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(context, "That didn't work!", Toast.LENGTH_SHORT).show();
+                    }
+                })
+        {
+            @Override
+            protected HashMap<String, String> getParams()
+            {
+                HashMap<String, String> params = new HashMap<>();
+                //encrypt message before sending to server
+                try {
+                    String encryptedMessage = aesCipher.encrypt(message, receiver);
+                    params.put("message-to-send", encryptedMessage);
+                }
+                catch (Exception e) {
+                    Log.d("Encryption Error: ", e.getMessage());
+                }
+
+                params.put("recipient", receiver);
+                return params;
+            }
+            @Override
+            public HashMap<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<>();
+                headers.put("Authorization", jwt);
+                return headers;
+            }
+        };
+
+        MySingleton.getInstance(context).addToRequestQueue(stringRequest);
     }
 
 }
