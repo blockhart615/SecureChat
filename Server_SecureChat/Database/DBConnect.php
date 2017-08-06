@@ -2,7 +2,7 @@
 //Configure Database Connection Variables
 define("DB_HOST", "localhost");
 define("DB_USER", "root");
-define("DB_PASSWORD", "**PASSWORD**");
+define("DB_PASSWORD", "PASSWORD");
 define("DB_DATABASE", "SecureChatDB");
 
 class DBConnect {

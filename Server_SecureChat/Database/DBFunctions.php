@@ -217,9 +217,7 @@ class DBFunctions
                 $response["conversations"] = $conversations;
                 $response["error"] = false;
                 $response["error_msg"] = "No errors!";
-
-
-                echo "Deleting messages........\n";     
+    
                 //delete messages after they have been received
                 $stmt = $this->conn->prepare("DELETE FROM messages WHERE receiver = ?");
                 $stmt->bind_param("s", $username);
