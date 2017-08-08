@@ -6,7 +6,7 @@ package Classes;
 public class Constants {
 
     //API URL's
-    public static final String BASE_URL = "http://192.168.0.9/Server_SecureChat/";
+    public static final String BASE_URL = "http://192.168.0.12/Server_SecureChat/";
     public static final String LOGIN_URL = BASE_URL + "login.php";
     public static final String REGISTER_URL = BASE_URL + "register.php";
     public static final String GET_MESSAGES_URL = BASE_URL + "GetMessage.php";
@@ -15,5 +15,13 @@ public class Constants {
 
     //Local storage
     public static final String LOGIN_FILENAME = "login.txt";
+
+    //Intents
+//    public static final String KEY_EXCHANGE_ACTIVITY = "";
+//    public static final String KEY_EXCHANGE_ACTIVITY = "";
+//    public static final String KEY_EXCHANGE_ACTIVITY = "";
+//    public static final String KEY_EXCHANGE_ACTIVITY = "";
+//    public static final String KEY_EXCHANGE_ACTIVITY = "";
+//    public static final String KEY_EXCHANGE_ACTIVITY = "";
 
 }

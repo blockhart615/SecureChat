@@ -6,11 +6,13 @@ package Classes;
 public class Message {
 
     private String sender;
+    private String receiver;
     private String timeStamp;
     private String message;
 
-    public Message(String sender, String timeStamp, String message){
+    public Message(String sender, String receiver, String timeStamp, String message){
         this.sender = sender;
+        this.receiver = receiver;
         this.timeStamp = timeStamp;
         this.message = message;
     }
@@ -27,6 +29,8 @@ public class Message {
     public String getTimeStamp() {
         return timeStamp;
     }
+
+    public String getReceiver() { return receiver; }
 
 
     /**

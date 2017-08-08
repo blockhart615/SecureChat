@@ -31,10 +31,13 @@ public class Conversation {
 
     /**
      * Constructor
+     * @param user
      * @param recipient
      */
-    public Conversation(String recipient) {
+    public Conversation(String user, String recipient) {
+        this.user = user;
         this.recipient = recipient;
+        conversation = new ArrayList<>();
     }
 
     /**
@@ -128,6 +131,14 @@ public class Conversation {
         };
 
         MySingleton.getInstance(context).addToRequestQueue(stringRequest);
+    }
+
+    /**
+     *
+     * @param message
+     */
+    public void addMessage(Message message) {
+        conversation.add(message);
     }
 
 }

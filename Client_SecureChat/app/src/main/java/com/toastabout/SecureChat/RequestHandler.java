@@ -145,11 +145,12 @@ public class RequestHandler {
 
                                 //get data from JSON message
                                 sender = messageObject.getString("sender");
-                                encryptedMessage = messageObject.getString("message");
+//                                encryptedMessage = messageObject.getString("message");
+                                message = messageObject.getString("message");
                                 timeStamp = messageObject.getString("time_sent");
 
                                 try {
-                                    message = aesCipher.decrypt(encryptedMessage);
+//                                    message = aesCipher.decrypt(encryptedMessage);
                                     String messageString = sender + ":\n" + message + "\n" + timeStamp;
                                     //add message to arraylist if it isn't already in the list
                                     if (!chatMessages.contains(messageString)){
@@ -245,8 +246,9 @@ public class RequestHandler {
                 HashMap<String, String> params = new HashMap<>();
                 //encrypt message before sending to server
                 try {
-                    String encryptedMessage = aesCipher.encrypt(message, receiver);
-                    params.put("message-to-send", encryptedMessage);
+//                    String encryptedMessage = aesCipher.encrypt(message, receiver);
+//                    params.put("message-to-send", encryptedMessage);
+                    params.put("message-to-send", message);
                 }
                 catch (Exception e) {
                     Log.d("Encryption Error: ", e.getMessage());

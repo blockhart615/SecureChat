@@ -9,6 +9,8 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import Classes.Inbox;
+
 
 public class ChatActivity extends AppCompatActivity {
 
@@ -38,6 +40,8 @@ public class ChatActivity extends AppCompatActivity {
                 getSupportActionBar().setTitle("Conversation With " + friend +":");
             }
 
+            Inbox inbox = new Inbox(username);
+            inbox.updateInbox(username, ChatActivity.this);
             requester.getChat(username, friend, listView, ChatActivity.this);
 
 

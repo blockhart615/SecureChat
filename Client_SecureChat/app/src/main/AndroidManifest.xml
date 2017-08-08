@@ -57,6 +57,16 @@
             </intent-filter>
         </activity>
         <activity
+            android:name="com.toastabout.SecureChat.KeyExchangeActivity"
+            android:label="@string/title_activity_key_exchange"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="com.toastabout.SecureChat.KeyExchangeActivity" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name="com.toastabout.SecureChat.TESTER"
             android:label="@string/title_activity_chat"
             android:theme="@style/AppTheme.NoActionBar"
@@ -69,17 +79,6 @@
             <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
             <!-- </intent-filter> -->
         </activity>
-        <activity
-            android:name="com.toastabout.SecureChat.KeyExchangeActivity"
-            android:label="@string/title_activity_key_exchange"
-            android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="com.toastabout.SecureChat.KeyExchange" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-
     </application>
 
 </manifest>

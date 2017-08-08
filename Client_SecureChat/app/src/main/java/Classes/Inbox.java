@@ -18,7 +18,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import Crypto.AESCipher;
 
@@ -31,12 +33,14 @@ public class Inbox {
     private JSONObject getMessageResponse, postMessageResponse;
     private Context context;
     private AESCipher aesCipher;
+    private String username;
 
     //A list of conversations for this user
-    private ArrayList<Conversation> conversations;
+    private Map<String, Conversation> conversations;
 
-    public Inbox() {
-
+    public Inbox(String username) {
+        this.username = username;
+        conversations = new HashMap<>();
     }
     /**
      * Loads conversations that are stored locally in files
@@ -48,25 +52,17 @@ public class Inbox {
     /**
      * Updates the conversations in the inbox with new messages from the server if there are any
      * @param username
-     * @param lv
-     * @param conversations
      * @param context
      */
     public void updateInbox(String username,
-                            final ListView lv,
-                            final ArrayList<String> conversations,
                             final Context context) {
 
-//STRING REQUEST TO GET MESSAGES FROM SERVER
+        //STRING REQUEST TO GET MESSAGES FROM SERVER
         StringRequest stringRequest = new StringRequest(Request.Method.GET, Constants.GET_URL + username,
                 new Response.Listener<String>() {
 
                     @Override
                     public void onResponse(String response) {
-
-                        String sender, message, encryptedMessage, timeStamp;
-                        JSONObject messageObject;
-                        ArrayList<String> chatMessages = new ArrayList<>();
 
                         try {
                             //make JSON object from response and get conversations
@@ -75,44 +71,19 @@ public class Inbox {
 
                             //TODO  Loop through each JSON Conversation and convert them into
                             //TODO  objects that we can use
-                            JSONArray jsonConversation = JSONconvos.getJSONArray(friend);
-
-                            //Loop thorugh JSONArray to get each message
-                            for (int i = 0; i < jsonConversation.length(); i++) {
-                                String JSONString = jsonConversation.getString(i);
-                                messageObject = new JSONObject(JSONString);
-
-                                //get data from JSON message
-                                sender = messageObject.getString("sender");
-                                encryptedMessage = messageObject.getString("message");
-                                timeStamp = messageObject.getString("time_sent");
-
-                                try {
-                                    message = aesCipher.decrypt(encryptedMessage);
-                                    String messageString = sender + ":\n" + message + "\n" + timeStamp;
-                                    //add message to arraylist if it isn't already in the list
-                                    if (!chatMessages.contains(messageString)){
-                                        chatMessages.add(messageString);
-                                    }
-                                }
-                                catch (Exception e){
-                                    Log.d("Decryption error: ", e.getMessage());
-                                }
-
-
-                            }
+                            parseResponse(JSONconvos);
 
                             //make array adapter for listView of messages and set adapter to list view
-                            final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, chatMessages);
-                            listView.setAdapter(arrayAdapter);
-
-                            listView.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    // Select the last row so it will scroll into view...
-                                    listView.setSelection(arrayAdapter.getCount() - 1);
-                                }
-                            });
+//                            final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, chatMessages);
+//                            listView.setAdapter(arrayAdapter);
+//
+//                            listView.post(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    // Select the last row so it will scroll into view...
+//                                    listView.setSelection(arrayAdapter.getCount() - 1);
+//                                }
+//                            });
 
                         }
                         catch (JSONException e) {
@@ -136,17 +107,75 @@ public class Inbox {
     /**
      * This method parses a successful JSON response and populates the Inbox's
      * conversations member.
-     * @param response
+     * @param JSONconvos
      */
-    private void parseResponse(JSONObject response) {
+    private void parseResponse(JSONObject JSONconvos) {
 
+        //iterator to go through each conversation
+        Iterator<String> convoItr = JSONconvos.keys();
 
-        Iterator<String> iter = response.keys();
-        while (iter.hasNext()) {
-            String next = iter.next();
-            if (!conversations.contains(next))
-                conversations.add(next);
+        try {
+            while (convoItr.hasNext()) {
+
+                String sender, receiver, message, encryptedMessage, timeStamp;
+                JSONObject messageObject;
+                ArrayList<String> chatMessages = new ArrayList<>();
+
+                //jsonarray that holds the conversation of the current friend
+                String friend = convoItr.next();
+                JSONArray jsonConversation = JSONconvos.getJSONArray(friend);
+
+                //add conversation to the map of conversations
+                conversations.put(friend, new Conversation(username, friend));
+
+                //now that we have json array of the friend,
+                //parse the messages from that friend into a list of messages
+
+                //Loop thorugh JSONArray to get each message
+                for (int i = 0; i < jsonConversation.length(); i++) {
+                    String JSONString = jsonConversation.getString(i);
+                    messageObject = new JSONObject(JSONString);
+
+                    //get data from JSON message
+                    sender = messageObject.getString("sender");
+                    receiver = messageObject.getString("receiver");
+                    message = messageObject.getString("message");
+//                    encryptedMessage = messageObject.getString("message");
+                    timeStamp = messageObject.getString("time_sent");
+
+                    //build message object and add it to the messages in the conversation
+                    //that correlates with the current friend.
+                    Message message1 = new Message(sender, receiver, timeStamp, message);
+                    conversations.get(friend).addMessage(message1);
+
+                    try {
+//                        message = aesCipher.decrypt(encryptedMessage);
+                        String messageString = sender + ":\n" + message + "\n" + timeStamp;
+                        //add message to arraylist if it isn't already in the list
+                        if (!chatMessages.contains(messageString)) {
+                            chatMessages.add(messageString);
+                        }
+                    } catch (Exception e) {
+                        Log.d("Decryption error: ", e.getMessage());
+                    }
+
+                }
+            }
         }
+        catch (JSONException e) {
+            Log.d("JSON error: ", e.getMessage());
+        }
+
+
+    } //end parseResponse
+
+
+    /**
+     *
+     * @param conversation
+     */
+    private void addConversation(String friend, Conversation conversation) {
+        conversations.put(friend, conversation);
     }
 
 }
