@@ -43,6 +43,8 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
+import Classes.Constants;
+
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.WHITE;
 
@@ -88,8 +90,8 @@ public class RSACipher {
 		privateKey = keyPair.getPrivate();
 
 		//file paths
-		keyChainFile = new File(context.getFilesDir().getPath() + "/KeyChain.txt"); //file with friends' public keys
-		myKeysFile = new File(context.getFilesDir().getPath() + "/MyKeys.txt"); //file with public/private key
+		keyChainFile = new File(context.getFilesDir().getPath() + Constants.KEYCHAIN_FILENAME); //file with friends' public keys
+		myKeysFile = new File(context.getFilesDir().getPath() + Constants.MYKEYS_FILENAME); //file with public/private key
 
 		//if my key File exsits, get keypair from file
 		if (myKeysFile.exists()) {

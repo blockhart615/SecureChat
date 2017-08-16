@@ -17,6 +17,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -42,6 +45,7 @@ public class Inbox {
         this.username = username;
         conversations = new HashMap<>();
     }
+
     /**
      * Loads conversations that are stored locally in files
      */
@@ -95,13 +99,29 @@ public class Inbox {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.w("VolleyError", error.getMessage());
+                        Log.w("VolleyError: ", error.getMessage());
                     }
                 }
         );
 
         //add response to queue to be sent to server
         MySingleton.getInstance(context).addToRequestQueue(stringRequest);
+    }
+
+    /**
+     * saves the inbox to a file to be read
+     */
+    public void writeInboxToFile(File inboxFile) {
+        try {
+            FileOutputStream fileOutput = new FileOutputStream(inboxFile);
+            ObjectOutputStream output = new ObjectOutputStream(fileOutput);
+            output.writeObject(this);
+            output.flush();
+            output.close();
+        }
+        catch (Exception e) {
+            Log.w("WriteInboxError: ", e.getMessage());
+        }
     }
 
     /**
@@ -125,8 +145,10 @@ public class Inbox {
                 String friend = convoItr.next();
                 JSONArray jsonConversation = JSONconvos.getJSONArray(friend);
 
-                //add conversation to the map of conversations
-                conversations.put(friend, new Conversation(username, friend));
+                //add conversation to the map of conversations (if the conversation doesn't already exist)
+                if (!conversations.containsKey(friend)) {
+                    conversations.put(friend, new Conversation(username, friend));
+                }
 
                 //now that we have json array of the friend,
                 //parse the messages from that friend into a list of messages
@@ -168,14 +190,4 @@ public class Inbox {
 
 
     } //end parseResponse
-
-
-    /**
-     *
-     * @param conversation
-     */
-    private void addConversation(String friend, Conversation conversation) {
-        conversations.put(friend, conversation);
-    }
-
 }

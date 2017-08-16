@@ -41,13 +41,6 @@ public class Conversation {
     }
 
     /**
-     * get latest messages from the server
-     */
-    public void pullConversations() {
-
-    }
-
-    /**
      * @return the conversation (might not be necessary. could handle it in loadConversation())
      */
     public ArrayList<Message> getConversation() {
