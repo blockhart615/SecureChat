@@ -183,11 +183,13 @@ class DBFunctions
 
                 while ($row = $result->fetch_assoc()) {
                     //get message contents into an associative array
+                    $id       = $row['id'];
                     $sender   = $row['sender'];
                     $message  = $row['message'];
                     $timeSent = $row['time_sent'];
                     $receiver = $row['receiver'];
                     $message  = array(
+                        'id'        => $id,
                         'sender'    => $sender,
                         'receiver'	=> $receiver,
                         'message'   => $message,
