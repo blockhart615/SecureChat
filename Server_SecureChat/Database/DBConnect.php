@@ -1,9 +1,9 @@
 <?php
 //Configure Database Connection Variables
-define("DB_HOST", "localhost");
-define("DB_USER", "root");
-define("DB_PASSWORD", "PASSWORD-GOES-HERE");
-define("DB_DATABASE", "SecureChatDB");
+define("DB_HOST", getenv('DB_HOST'));
+define("DB_USER", getenv('DB_LOGIN'));
+define("DB_PASSWORD", getenv('DB_PW'));
+define("DB_DATABASE", getenv('DB_NAME'));
 
 class DBConnect {
       private $conn;
