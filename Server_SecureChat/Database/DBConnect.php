@@ -16,21 +16,3 @@ class DBConnect {
       }
 }
 ?>
-
-
-<?php
-
-class DBConnect {
-      private $conn;
-
-      public function connect() {
-            //make connection to database
-            $this->conn = new mysqli(,
-                                     ,
-                                    ,
-                                     );
-
-            return $this->conn;
-      }
-}
-?>
